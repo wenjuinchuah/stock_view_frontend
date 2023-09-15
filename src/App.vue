@@ -45,12 +45,9 @@ p {
 }
 
 .app {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  flex-wrap: wrap;
   padding: 15px;
 }
+
 .k-line-chart-container {
   display: flex;
   flex-direction: column;
@@ -58,8 +55,7 @@ p {
   border-radius: 2px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   background-color: #ffffff;
-  width: 620px;
-  height: 440px;
+  height: 100vh;
   padding: 16px 6px 16px 16px;
 }
 
