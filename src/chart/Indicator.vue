@@ -1,22 +1,17 @@
 <template>
-<Layout title="Indicator">
+  <Layout title="Indicator">
     <div id="indicator-k-line" class="k-line-chart" />
     <div class="k-line-chart-menu-container">
-        <span style="padding-right: 10px; padding-left: 12px">Sub Indicator</span>
-        <button v-for="type in subIndicators" :key="type" v-on:click="setSubIndicator(type)">
-            {{ type }}
-        </button>
-        // <button v-on:click="setSubIndicator('CCI', [7])">CCI(7)</button>
+      <span style="padding-right: 10px; padding-left: 12px">Indicator</span>
+      <button v-for="type in indicators" :key="type" v-on:click="setIndicator(type.name)">
+        {{ type.name.toLocaleUpperCase() }}
+      </button>
     </div>
-</Layout>
+  </Layout>
 </template>
 
 <script>
-import {
-    dispose,
-    init,
-    registerOverlay
-} from "klinecharts";
+import { dispose, init, registerOverlay } from "klinecharts";
 import generatedDataList from "../generatedDataList";
 import Layout from "../Layout.vue";
 

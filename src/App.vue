@@ -69,6 +69,7 @@ p {
   display: flex;
   flex: 1;
 }
+
 .k-line-chart-menu-container {
   display: flex;
   flex-direction: row;
@@ -78,6 +79,7 @@ p {
   font-size: 12px;
   color: #606060;
 }
+
 .k-line-chart-menu-container button {
   cursor: pointer;
   background-color: #1677ff;

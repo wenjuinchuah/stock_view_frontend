@@ -4,9 +4,11 @@ export default async function (stock_code) {
   const dataList = [];
 
   try {
-    const response = await axios.get(
-      "http://127.0.0.1:5000/stock?stock_code=" + stock_code
-    );
+    const response = await axios.get("http://127.0.0.1:8000/stock", {
+      params: {
+        stock_code: stock_code,
+      },
+    });
 
     const { open, low, high, close, volume, timestamp } = response.data.data;
 
