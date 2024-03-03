@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { init, dispose } from "klinecharts";
 import { useStockChartStore } from "@/stores/StockChartStore";
 import { useSettingsMenuStore } from "@/stores/SettingsMenuStore";
+import { StoreStatus } from "@/enums/StoreStatus";
 
-const store = useStockChartStore();
-const settingsStore = useSettingsMenuStore();
-const stockName = store.stockName;
-const chartData = store.chartData;
+const stockChartStore = useStockChartStore();
+const settingsMenuStore = useSettingsMenuStore();
+
+const priceList = computed(() => stockChartStore.priceList);
+const status = computed(() => stockChartStore.status);
+const isSettingsMenuToggled = computed(() => settingsMenuStore.isToggled);
 
 const stockChart = ref(null);
 
@@ -20,51 +23,53 @@ const handleResize = () => {
     }, 200);
 };
 
-onMounted(() => {
-    const chart = init("chart");
-    stockChart.value = chart;
-    chart.applyNewData(chartData);
-    chart.setStyles({
-        candle: {
-            tooltip: {
-                text: {
-                    marginTop: 32,
-                    marginLeft: 24,
+onMounted(async () => {
+    try {
+        await stockChartStore.fetch();
+        if (priceList.value != null) {
+            const chart = init("chart");
+            stockChart.value = chart;
+            chart.applyNewData(priceList.value);
+            chart.setStyles({
+                candle: {
+                    tooltip: {
+                        text: {
+                            marginTop: 32,
+                            marginLeft: 24,
+                        },
+                    },
                 },
-            },
-        },
-    });
-
-    window.addEventListener("resize", handleResize);
+            });
+            window.addEventListener("resize", handleResize);
+        }
+    } catch (error) {
+        console.error(error);
+    }
 });
 
 onUnmounted(() => {
     dispose("chart");
-
     window.removeEventListener("resize", handleResize);
 });
 
-watch(
-    () => settingsStore.isToggled,
-    () => {
-        setTimeout(() => {
-            stockChart.value.resize();
-        }, 400);
-    }
-);
+watch(isSettingsMenuToggled, () => {
+    setTimeout(() => stockChart.value.resize(), 400);
+});
 </script>
 
 <template>
     <div id="stock-info" class="mx-4 mt-4 d-flex column-gap-2 align-items-center">
         <img
             src="https://cdn.zonebourse.com/static/instruments-squared-6491196"
-            :alt="stockName"
+            :alt="1"
             class="rounded-circle d-flex"
             style="width: 20px; height: 20px"
         />
-        <div>{{ stockName }}</div>
+        <div v-if="status == StoreStatus.isIdle && priceList.length > 0">
+            {{ priceList[0].stockCode }}
+        </div>
     </div>
-    <div id="chart" class="my-4 me-2 col"></div>
+    <div id="chart" class="my-4 me-2 col" v-if="priceList.length > 0"></div>
 </template>
 
 <style>
