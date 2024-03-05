@@ -4,6 +4,7 @@ import { init, dispose } from "klinecharts";
 import { useStockChartStore } from "@/stores/StockChartStore";
 import { useSettingsMenuStore } from "@/stores/SettingsMenuStore";
 import { StoreStatus } from "@/enums/StoreStatus";
+import { Toast } from "bootstrap";
 
 const stockChartStore = useStockChartStore();
 const settingsMenuStore = useSettingsMenuStore();
@@ -43,7 +44,7 @@ onMounted(async () => {
             window.addEventListener("resize", handleResize);
         }
     } catch (error) {
-        console.error(error);
+        console.log(error);
     }
 });
 
@@ -58,14 +59,18 @@ watch(isSettingsMenuToggled, () => {
 </script>
 
 <template>
-    <div id="stock-info" class="mx-4 mt-4 d-flex column-gap-2 align-items-center">
+    <div
+        id="stock-info"
+        class="mx-4 mt-4 d-flex column-gap-2 align-items-center"
+        v-if="priceList.length > 0"
+    >
         <img
             src="https://cdn.zonebourse.com/static/instruments-squared-6491196"
             :alt="1"
             class="rounded-circle d-flex"
             style="width: 20px; height: 20px"
         />
-        <div v-if="status == StoreStatus.isIdle && priceList.length > 0">
+        <div>
             {{ priceList[0].stockCode }}
         </div>
     </div>
