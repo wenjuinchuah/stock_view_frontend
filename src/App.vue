@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
+import SettingsMenu from "@/components/SettingsMenu.vue";
+import DashboardView from "@/views/DashboardView.vue";
 </script>
 
 <template>
-    <header>
-        <div class="wrapper">
-            <nav>
-                <!-- <RouterLink to="/">Dashboard</RouterLink>
-        <RouterLink to="/about">About</RouterLink> -->
-            </nav>
-        </div>
-    </header>
-
-    <RouterView />
+    <v-layout>
+        <SettingsMenu />
+        <v-main class="d-flex align-center justify-center" scrollable>
+            <DashboardView />
+        </v-main>
+    </v-layout>
 </template>

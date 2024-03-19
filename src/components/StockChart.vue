@@ -61,7 +61,7 @@ watch(isSettingsMenuToggled, () => {
 <template>
     <div
         id="stock-info"
-        class="mx-4 mt-4 d-flex column-gap-2 align-items-center"
+        class="mx-4 mb-4 d-flex column-gap-2 align-items-center"
         v-if="priceList.length > 0"
     >
         <img
@@ -74,7 +74,7 @@ watch(isSettingsMenuToggled, () => {
             {{ priceList[0].stockCode }}
         </div>
     </div>
-    <div id="chart" class="my-4 me-2 col" v-if="priceList.length > 0"></div>
+    <div id="chart" v-if="priceList.length > 0"></div>
 </template>
 
 <style>
@@ -84,8 +84,9 @@ main {
 
 #chart {
     position: relative;
-    z-index: 1;
+    z-index: 1005;
     height: calc(100vh - 3rem);
+    width: 100%;
 }
 
 #stock-info {
