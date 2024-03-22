@@ -3,14 +3,15 @@ import { onMounted, onUnmounted, ref, computed, watch } from "vue";
 import { init, dispose } from "klinecharts";
 import { useStockChartStore } from "@/stores/StockChartStore";
 import { useSettingsMenuStore } from "@/stores/SettingsMenuStore";
-import { StoreStatus } from "@/enums/StoreStatus";
-import { Toast } from "bootstrap";
+import { PriceList } from "@/types/PriceList";
+import { Stock } from "@/types/Stock";
 
 const stockChartStore = useStockChartStore();
 const settingsMenuStore = useSettingsMenuStore();
 
-const priceList = computed(() => stockChartStore.priceList);
-const status = computed(() => stockChartStore.status);
+const priceList: List<PriceList> = computed(() => stockChartStore.priceList);
+const selectedStock: Stock = computed(() => stockChartStore.selectedStock);
+const isPriceListEmpty = computed(() => stockChartStore.isPriceListEmpty());
 const isSettingsMenuToggled = computed(() => settingsMenuStore.isToggled);
 
 const stockChart = ref(null);
@@ -27,7 +28,7 @@ const handleResize = () => {
 onMounted(async () => {
     try {
         await stockChartStore.fetch();
-        if (priceList.value != null) {
+        if (!isPriceListEmpty.value) {
             const chart = init("chart");
             stockChart.value = chart;
             chart.applyNewData(priceList.value);
@@ -62,19 +63,19 @@ watch(isSettingsMenuToggled, () => {
     <div
         id="stock-info"
         class="mx-4 mb-4 d-flex column-gap-2 align-items-center"
-        v-if="priceList.length > 0"
+        v-if="!isPriceListEmpty"
     >
-        <img
+        <!-- <img
             src="https://cdn.zonebourse.com/static/instruments-squared-6491196"
             :alt="1"
             class="rounded-circle d-flex"
             style="width: 20px; height: 20px"
-        />
-        <div>
-            {{ priceList[0].stockCode }}
-        </div>
+        /> -->
+        <p class="font-weight-medium">
+            {{ selectedStock ? selectedStock.stockName : "" }}
+        </p>
     </div>
-    <div id="chart" v-if="priceList.length > 0"></div>
+    <div id="chart" v-if="!isPriceListEmpty"></div>
 </template>
 
 <style>
