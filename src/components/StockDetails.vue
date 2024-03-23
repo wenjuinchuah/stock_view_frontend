@@ -20,10 +20,10 @@ const stockDetailsMap = computed(() => {
         return {};
     }
     return {
-        "Last Close": lastPrice.value.close,
-        "Last Open": lastPrice.value.open,
-        "Last High": lastPrice.value.high,
-        "Last Low": lastPrice.value.low,
+        Open: lastPrice.value.open,
+        Close: lastPrice.value.close,
+        High: lastPrice.value.high,
+        Low: lastPrice.value.low,
     };
 });
 </script>
@@ -38,12 +38,12 @@ const stockDetailsMap = computed(() => {
                     cols="auto"
                     :class="percentageChange < 0 ? 'text-red' : 'text-green'"
                     >({{ priceChange > 0 ? "+" : ""
-                    }}{{ percentageChange.toFixed(2) }}%)</span
+                    }}{{ percentageChange.toFixed(3) }}%)</span
                 ></v-col
             >
         </v-row>
         <v-row no-gutters align="center">
-            <v-col cols="auto" class="text-subtitle-2 text-grey-darken-2">{{
+            <v-col cols="auto" class="text-subtitle-2 text-grey-darken-1">{{
                 selectedStock.stockCode
             }}</v-col>
             <v-col cols="auto" v-if="selectedStock.isShariah"
@@ -51,7 +51,7 @@ const stockDetailsMap = computed(() => {
                     icon="dark_mode"
                     size="x-small"
                     variant="outlined"
-                    color="green"
+                    color="green-darken-3"
                     density="comfortable"
                     class="mx-1 mb-1"
                 ></v-btn
@@ -60,6 +60,18 @@ const stockDetailsMap = computed(() => {
         <v-row no-gutters
             ><v-col class="text-caption text-grey mb-1">
                 {{ selectedStock.category }}</v-col
+            ></v-row
+        >
+        <v-row no-gutters
+            ><v-col class="text-caption text-grey-darken-2 mt-2">
+                Last Updated:
+                {{
+                    new Date(lastPrice.timestamp).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                    })
+                }}</v-col
             ></v-row
         >
         <v-row

@@ -6,18 +6,22 @@ import { StoreStatus } from '@/enums/StoreStatus'
 import { ref } from 'vue'
 
 export const useStockChartStore = defineStore('stockChart', () => {
-  const defaultStockCode = ref('3182')
+  const defaultStockCode = ref('0001')
 
   const state = {
     priceList: ref<List<PriceList>>(),
-    status: ref(StoreStatus.isIdle),
+    status: ref<StoreStatus>(StoreStatus.isIdle),
     selectedStock: ref<Stock>(),
-    priceChange: ref(0),
-    percentageChange: ref(0)
+    priceChange: ref<number>(0),
+    percentageChange: ref<number>(0)
   }
 
   const actions = {
-    async fetch(stockCode: string = defaultStockCode.value) {
+    async fetch(
+      stockCode: string = state.selectedStock.value
+        ? state.selectedStock.value.stockCode
+        : defaultStockCode.value
+    ) {
       state.status.value = StoreStatus.isBusy
       try {
         const response = await HttpService.get(`/stock/get?stock_code=${stockCode}`)
@@ -40,6 +44,9 @@ export const useStockChartStore = defineStore('stockChart', () => {
       if (state.priceList.value == null && state.status.value === StoreStatus.isIdle) {
         return true
       }
+    },
+    updateSelectedStock(stock: Stock) {
+      state.selectedStock.value = stock
     }
   }
 

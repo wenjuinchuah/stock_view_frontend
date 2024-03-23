@@ -1,12 +1,22 @@
 export interface Stock {
-  stockCode: string
-  stockName: string
-  category: string
+  stockCode?: string
+  stockName?: string
+  category?: string
   isShariah: boolean
 }
 
 export namespace Stock {
   export function fromJson(json: any): Stock {
+    if (Array.isArray(json.data)) {
+      return json.data.map((item: any) => {
+        return {
+          stockCode: item.stock_code,
+          stockName: item.stock_name,
+          category: item.category,
+          isShariah: item.is_shariah == 1 ? true : false
+        }
+      })
+    }
     const data = json.data
     return {
       stockCode: data.stock_code,

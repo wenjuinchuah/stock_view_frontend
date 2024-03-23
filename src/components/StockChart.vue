@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed, watch } from "vue";
+import { onMounted, onUnmounted, computed, watch, ref } from "vue";
 import { init, dispose } from "klinecharts";
 import { useStockChartStore } from "@/stores/StockChartStore";
 import { useSettingsMenuStore } from "@/stores/SettingsMenuStore";
@@ -14,7 +14,7 @@ const selectedStock: Stock = computed(() => stockChartStore.selectedStock);
 const isPriceListEmpty = computed(() => stockChartStore.isPriceListEmpty());
 const isSettingsMenuToggled = computed(() => settingsMenuStore.isToggled);
 
-const stockChart = ref(null);
+const stockChart = ref();
 
 const handleResize = () => {
     if (window.resizeTimer) {
@@ -57,6 +57,12 @@ onUnmounted(() => {
 watch(isSettingsMenuToggled, () => {
     setTimeout(() => stockChart.value.resize(), 400);
 });
+
+watch(priceList, () => {
+    if (stockChart.value) {
+        stockChart.value.applyNewData(priceList.value);
+    }
+});
 </script>
 
 <template>
@@ -71,8 +77,8 @@ watch(isSettingsMenuToggled, () => {
             class="rounded-circle d-flex"
             style="width: 20px; height: 20px"
         /> -->
-        <p class="font-weight-medium">
-            {{ selectedStock ? selectedStock.stockName : "" }}
+        <p class="font-weight-medium" v-if="selectedStock">
+            [{{ selectedStock.stockCode }}] {{ selectedStock.stockName }}
         </p>
     </div>
     <div id="chart" v-if="!isPriceListEmpty"></div>
