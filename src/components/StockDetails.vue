@@ -20,8 +20,8 @@ const stockDetailsMap = computed(() => {
         return {};
     }
     return {
-        Open: lastPrice.value.open,
         Close: lastPrice.value.close,
+        Open: lastPrice.value.open,
         High: lastPrice.value.high,
         Low: lastPrice.value.low,
     };
