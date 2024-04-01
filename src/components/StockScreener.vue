@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { useStockScreenerStore } from "@/stores/StockScreenerStore";
 import DateRangePicker from "@/components/DateRangePicker.vue";
+// import { computed } from "vue";
 
 const store = useStockScreenerStore();
+// const isToggled = computed(() => store.isToggled);
+
+const screen = () => {
+    store.toggle();
+    store.fetch(true);
+};
 </script>
 
 <template>
@@ -42,7 +49,7 @@ const store = useStockScreenerStore();
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn class="bg-red mx-4" width="200">Delete All Rules</v-btn>
-                <v-btn class="bg-blue-darken-3 ms-4" width="200" @click.stop="store.fetch(true)">Start Screening</v-btn>
+                <v-btn class="bg-blue-darken-3 ms-4" width="200" @click.stop="screen">Start Screening</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

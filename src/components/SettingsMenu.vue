@@ -48,31 +48,28 @@ const toggleScreener = () => {
         <template v-if="screenedStock.length > 0">
             <!-- Placeholder -->
             <v-row no-gutters justify="space-between" class="px-4 text-center text-caption text-grey-darken-2">
-                <v-col cols="4">Symbol</v-col>
+                <v-col cols="6">Symbol</v-col>
                 <v-col cols="3">Open</v-col>
                 <v-col cols="3">Close</v-col>
-                <v-col cols="0"></v-col>
             </v-row>
             <!-- Render stock information -->
             <v-list lines="one">
-                <v-list-group v-for="(stock, key) in screenedStock" :key="key" :value="key" class="font-weight-medium">
-                    <template v-slot:activator="{ props }">
-                        <v-list-item v-bind="props" density="comfortable" slim>
-                            <v-list-item-title>
-                                <v-row no-gutters justify="space-between">
-                                    <v-col cols="5">{{ stock.stockName }}</v-col>
-                                    <v-col cols="3">{{
+                <v-list-item v-for="(stock, key) in screenedStock" :key="key" :value="key" class="font-weight-medium"
+                    density="comfortable" slim>
+                    <v-list-item-title>
+                        <v-row no-gutters justify="space-between">
+                            <v-col cols="6">{{ stock.stockName }}</v-col>
+                            <v-col cols="3" class="text-center">{{
         stockScreenerStore.getLastOpenPrice(stockPriceList[stock.stockCode]).toFixed(3)
     }}</v-col>
-                                    <v-col cols="3">{{
+                            <v-col cols="3" class="text-center">{{
             stockScreenerStore.getLastClosePrice(stockPriceList[stock.stockCode]).toFixed(3)
         }}</v-col>
-                                </v-row>
-                            </v-list-item-title>
-                        </v-list-item>
-                    </template>
-                </v-list-group>
+                        </v-row>
+                    </v-list-item-title>
+                </v-list-item>
             </v-list>
+            <v-container fluid style="height: 68px"></v-container>
         </template>
 
         <template v-else-if="stockScreenerStore.status === StoreStatus.isBusy">
@@ -86,10 +83,10 @@ const toggleScreener = () => {
             </v-row>
         </template>
         <StockScreener />
-        <!-- <div class="position-absolute bottom-0 bg-white" style="width: 280px"> -->
-        <div>
-            <v-divider thickness="4" v-if="!isPriceListEmpty" class="mb-0"></v-divider>
-            <StockDetails />
+        <div class="position-absolute bottom-0 bg-white" style="width: 280px">
+            <!-- <div> -->
+            <!-- <v-divider thickness="4" v-if="!isPriceListEmpty" class="mb-0"></v-divider> -->
+            <!-- <StockDetails /> -->
             <!-- Chart Settings -->
             <v-row no-gutters class="p-3"><v-btn block id="settingsBtn" prepend-icon="settings" variant="outlined"
                     @click.stop="" class="bg-white">Chart

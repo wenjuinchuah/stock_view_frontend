@@ -8,7 +8,7 @@ import { Stock } from "@/interfaces/Stock";
 const searchBarStore = useSearchBarStore();
 const status: StoreStatus = computed(() => searchBarStore.status);
 const matchedQuery: List<Stock> = computed(() => searchBarStore.matchedQuery);
-    
+
 const selectedStock = ref<Stock>();
 const stockChartStore = useStockChartStore();
 
@@ -18,9 +18,6 @@ watch(selectedStock, async () => {
         stockChartStore.updateSelectedStock(selectedStock.value);
         try {
             await stockChartStore.fetch();
-            // if (!stockChartStore.isPriceListEmpty()) {
-            //     stockChartStore.stockChart.applyNewData(stockChartStore.priceList);
-            // }
         } catch (error) {
             console.error(error);
         }
@@ -40,7 +37,6 @@ watch(selectedStock, async () => {
         append-inner-icon="search"
         menu-icon=""
         hide-details="auto"
-        clear-on-select
         v-model="selectedStock"
         @update:search="searchBarStore.onInput"
         :loading="status === StoreStatus.isBusy"

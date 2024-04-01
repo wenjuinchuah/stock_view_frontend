@@ -5,6 +5,7 @@ import { useStockChartStore } from "@/stores/StockChartStore";
 import { useSettingsMenuStore } from "@/stores/SettingsMenuStore";
 import { PriceList } from "@/types/PriceList";
 import { Stock } from "@/types/Stock";
+import "@/services/FormatService";
 
 const stockChartStore = useStockChartStore();
 const settingsMenuStore = useSettingsMenuStore();
@@ -66,20 +67,11 @@ watch(priceList, () => {
 </script>
 
 <template>
-    <div
-        id="stock-info"
-        class="mx-4 mb-4 d-flex column-gap-2 align-items-center"
-        v-if="!isPriceListEmpty"
-    >
-        <!-- <img
-            src="https://cdn.zonebourse.com/static/instruments-squared-6491196"
-            :alt="1"
-            class="rounded-circle d-flex"
-            style="width: 20px; height: 20px"
-        /> -->
-        <p class="font-weight-medium" v-if="selectedStock">
+    <div id="stock-info" class="mx-4 mb-4 d-flex column-gap-2 align-items-center" v-if="!isPriceListEmpty && selectedStock">
+        <p class="font-weight-medium">
             [{{ selectedStock.stockCode }}] {{ selectedStock.stockName }}
         </p>
+        <p class="text-grey">{{ selectedStock.stockFullName.capitalize() }}</p>
     </div>
     <div id="chart" v-if="!isPriceListEmpty"></div>
 </template>

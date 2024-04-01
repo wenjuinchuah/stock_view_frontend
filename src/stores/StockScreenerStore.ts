@@ -48,6 +48,7 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
     },
     toggle() {
       state.isToggled.value = !state.isToggled.value
+      // console.log(state.isToggled.value)
     },
     startDateChange(date: Date) {
       state.stockScreener.value.startDate = date.getTime() / 1000

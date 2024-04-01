@@ -41,9 +41,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
       }
     },
     isPriceListEmpty() {
-      if (state.priceList.value == null && state.status.value === StoreStatus.isIdle) {
-        return true
-      }
+      return state.priceList.value == null && state.status.value === StoreStatus.isIdle
     },
     updateSelectedStock(stock: Stock) {
       state.selectedStock.value = stock
