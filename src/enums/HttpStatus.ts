@@ -1,4 +1,4 @@
 export enum HttpStatus {
-  SUCCESS = 'SUCCESS',
-  ERROR = 'ERROR'
+    SUCCESS = 'SUCCESS',
+    ERROR = 'ERROR',
 }

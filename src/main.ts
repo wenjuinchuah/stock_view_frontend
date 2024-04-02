@@ -19,15 +19,15 @@ import App from './App.vue'
 
 const app = createApp(App)
 const vuetify = createVuetify({
-  components,
-  directives,
-  icons: {
-    defaultSet: 'md',
-    aliases,
-    sets: {
-      md
-    }
-  }
+    components,
+    directives,
+    icons: {
+        defaultSet: 'md',
+        aliases,
+        sets: {
+            md,
+        },
+    },
 })
 
 app.use(createPinia())

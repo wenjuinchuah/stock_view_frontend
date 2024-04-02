@@ -1,28 +1,30 @@
 <script setup lang="ts">
-import { useSearchBarStore } from "@/stores/SearchBarStore";
-import { useStockChartStore } from "@/stores/StockChartStore";
-import { watch, computed, ref } from "vue";
-import { StoreStatus } from "@/enums/StoreStatus";
-import { Stock } from "@/interfaces/Stock";
+import { useSearchBarStore } from '@/stores/SearchBarStore'
+import { useStockChartStore } from '@/stores/StockChartStore'
+import { watch, computed, ref } from 'vue'
+import { StoreStatus } from '@/enums/StoreStatus'
+import { Stock } from '@/interfaces/Stock'
 
-const searchBarStore = useSearchBarStore();
-const status: StoreStatus = computed(() => searchBarStore.status);
-const matchedQuery: List<Stock> = computed(() => searchBarStore.matchedQuery);
+const searchBarStore = useSearchBarStore()
+const status: StoreStatus = computed(() => searchBarStore.status)
+const matchedQuery: List<Stock> = computed(() => searchBarStore.matchedQuery)
 
-const selectedStock = ref<Stock>();
-const stockChartStore = useStockChartStore();
-
+const selectedStock = ref<Stock>()
+const stockChartStore = useStockChartStore()
 
 watch(selectedStock, async () => {
-    if (selectedStock.value !== stockChartStore.selectedStock.value && selectedStock.value !== null) {
-        stockChartStore.updateSelectedStock(selectedStock.value);
+    if (
+        selectedStock.value !== stockChartStore.selectedStock.value &&
+        selectedStock.value !== null
+    ) {
+        stockChartStore.updateSelectedStock(selectedStock.value)
         try {
-            await stockChartStore.fetch();
+            await stockChartStore.fetch()
         } catch (error) {
-            console.error(error);
+            console.error(error)
         }
     }
-});
+})
 </script>
 
 <template>

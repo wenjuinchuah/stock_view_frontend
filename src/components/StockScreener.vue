@@ -1,56 +1,150 @@
 <script setup lang="ts">
-import { useStockScreenerStore } from "@/stores/StockScreenerStore";
-import DateRangePicker from "@/components/DateRangePicker.vue";
-// import { computed } from "vue";
+import { useStockScreenerStore } from '@/stores/StockScreenerStore'
+import { useAddRuleStore } from '@/stores/AddRuleStore'
+import DateRangePicker from '@/components/DateRangePicker.vue'
+import AddRule from '@/components/AddRule.vue'
+import CCIScreener from '@/components/CCIScreener.vue'
+import { onMounted, computed } from 'vue'
 
-const store = useStockScreenerStore();
-// const isToggled = computed(() => store.isToggled);
-
+const stockScreenerStore = useStockScreenerStore()
+const startDate = () =>
+    new Date(stockScreenerStore.stockScreener.startDate * 1000)
+const endDate = () => new Date(stockScreenerStore.stockScreener.endDate * 1000)
 const screen = () => {
-    store.toggle();
-    store.fetch(true);
-};
+    stockScreenerStore.toggle()
+    stockScreenerStore.fetch(true)
+}
+
+const addRuleStore = useAddRuleStore()
+const selectedRules = computed(() => addRuleStore.selectedRules)
+const addRule = () => {
+    addRuleStore.toggle()
+}
+
+onMounted(() => {
+    addRuleStore.fetch()
+})
 </script>
 
 <template>
-    <v-dialog max-width="800" max-height="700" v-model="store.isToggled" scrollable class="overflow-visible">
-        <v-card class="pa-4">
-            <v-row no-gutters justify="space-between">
-                <v-col cols=auto>
-                    <v-card-title>Technical Stock Screener</v-card-title>
-                </v-col>
-                <v-col cols="auto">
-                    <v-btn icon="close" variant="plain" @click="store.toggle"></v-btn>
-                </v-col>
-            </v-row>
-            <!-- Date range picker -->
-            <v-row no-gutters>
-                <v-col cols=auto align-self="center">
-                    <v-card-text class="py-0">Show me all stocks range</v-card-text>
-                </v-col>
-                <v-col cols="auto">
-                    <DateRangePicker @update:start-date="store.startDateChange"
-                        @update:end-date="store.endDateChange" />
-                </v-col>
-            </v-row>
-            <!-- Rules -->
-            <v-img :src="'/assets/svgs/add_new_rules.svg'" alt="add new rules" class="mt-4" height="300"></v-img>
-            <v-row no-gutters class="mb-4">
-                <v-col align="center" class="font-weight-medium">No rules yet</v-col>
-            </v-row>
-            <!-- Add new rules button -->
-            <v-row no-gutters class="mx-3 my-4">
-                <v-btn block prepend-icon="add" variant="outlined" @click.stop="" style="border-style: dashed;"
-                    height="65">Add new
-                    rules
-                </v-btn>
-            </v-row>
-            <!-- Actions button -->
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn class="bg-red mx-4" width="200">Delete All Rules</v-btn>
-                <v-btn class="bg-blue-darken-3 ms-4" width="200" @click.stop="screen">Start Screening</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+    <v-form @submit.prevent validate-on="submit">
+        <v-dialog
+            max-width="800"
+            max-height="700"
+            v-model="stockScreenerStore.isToggled"
+            scrollable
+        >
+            <v-card class="pa-4">
+                <v-row no-gutters justify="space-between">
+                    <v-col cols="auto">
+                        <v-card-title>Technical Stock Screener</v-card-title>
+                    </v-col>
+                    <v-col cols="auto">
+                        <v-btn
+                            icon="close"
+                            variant="plain"
+                            @click.stop="stockScreenerStore.toggle"
+                        ></v-btn>
+                    </v-col>
+                </v-row>
+                <!-- Date range picker -->
+                <v-row no-gutters>
+                    <v-col cols="auto" align-self="center">
+                        <v-card-text class="py-0"
+                            >Show me all stocks range</v-card-text
+                        >
+                    </v-col>
+                    <v-col cols="auto">
+                        <DateRangePicker
+                            @update:start-date="
+                                stockScreenerStore.startDateChange
+                            "
+                            @update:end-date="stockScreenerStore.endDateChange"
+                            :startDate="startDate()"
+                            :endDate="endDate()"
+                        />
+                    </v-col>
+                </v-row>
+                <!-- Rules -->
+                <template v-if="selectedRules.length === 0">
+                    <v-img
+                        :src="'/assets/svgs/add_new_rules.svg'"
+                        alt="add new rules"
+                        class="mt-4"
+                        height="300"
+                    ></v-img>
+                    <v-row no-gutters class="mb-4">
+                        <v-col align="center" class="font-weight-medium"
+                            >No rules yet</v-col
+                        >
+                    </v-row>
+                </template>
+
+                <template v-else v-for="value in selectedRules" :key="value">
+                    <div class="m-4">
+                        <v-row no-gutters justify="space-between">
+                            <v-col cols="auto"
+                                ><v-card-text class="py-0 text-blue-darken-2"
+                                    >AND</v-card-text
+                                ></v-col
+                            >
+                            <v-col cols="auto"
+                                ><v-btn
+                                    class="text-decoration-underline"
+                                    variant="text"
+                                    density="compact"
+                                    color="red"
+                                    @click.stop="
+                                        addRuleStore.removeRules([value])
+                                    "
+                                    >Delete</v-btn
+                                ></v-col
+                            >
+                        </v-row>
+                        <template v-if="value === 'CCI'">
+                            <CCIScreener />
+                        </template>
+                        <template v-else-if="value === 'MACD'">
+                            <!-- <MACDScreener /> -->
+                        </template>
+                        <template v-else-if="value === 'KDJ'">
+                            <!-- <KDJScreener /> -->
+                        </template>
+                    </div>
+                </template>
+                <!-- Add new rules button -->
+                <v-row no-gutters class="mx-3 my-4">
+                    <v-btn
+                        block
+                        prepend-icon="add"
+                        variant="outlined"
+                        @click.stop="addRule"
+                        style="border-style: dashed"
+                        height="65"
+                        >Add new rules
+                    </v-btn>
+                </v-row>
+                <AddRule />
+                <!-- Actions button -->
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        class="bg-red mx-4"
+                        width="200"
+                        @click.stop="
+                            addRuleStore.removeRules(addRuleStore.selectedRules)
+                        "
+                        >Delete All Rules</v-btn
+                    >
+                    <v-btn
+                        class="bg-blue-darken-3 ms-4"
+                        width="200"
+                        @click.stop="screen"
+                        type="submit"
+                        >Start Screening</v-btn
+                    >
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    </v-form>
 </template>

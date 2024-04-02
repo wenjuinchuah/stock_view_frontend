@@ -1,78 +1,75 @@
 export interface StockIndicator {}
 
 export interface CCI extends StockIndicator {
-  timePeriod: number
-  overbought: number
-  oversold: number
+    timePeriod: number
+    overbought: number
+    oversold: number
 }
 
 export interface MACD extends StockIndicator {
-  fastPeriod: number
-  slowPeriod: number
-  signalPeriod: number
+    fastPeriod: number
+    slowPeriod: number
+    signalPeriod: number
 }
 
 export interface KDJ extends StockIndicator {
-  loopbackPeriod: number
-  signalPeriod: number
-  smoothPeriod: number
+    loopbackPeriod: number
+    signalPeriod: number
+    smoothPeriod: number
 }
 
 export namespace StockIndicator {
-  export function fromJson(data: any): StockIndicator[] {
-    const cci = data.cci
-      ? {
-          timePeriod: data.cci.time_period,
-          overbought: data.cci.overbought,
-          oversold: data.cci.oversold
+    export function fromJson(json: any): StockIndicator {
+        if (json.CCI) {
+            return {
+                timePeriod: json.CCI.time_period,
+                overbought: json.CCI.overbought,
+                oversold: json.CCI.oversold,
+            }
+        } else if (json.MACD) {
+            return {
+                fastPeriod: json.MACD.fast_period,
+                slowPeriod: json.MACD.slow_period,
+                signalPeriod: json.MACD.signal_period,
+            }
+        } else if (json.KDJ) {
+            return {
+                loopbackPeriod: json.KDJ.loopback_period,
+                signalPeriod: json.KDJ.signal_period,
+                smoothPeriod: json.KDJ.smooth_period,
+            }
         }
-      : null
+    }
 
-    const macd = data.macd
-      ? {
-          fastPeriod: data.macd.fast_period,
-          slowPeriod: data.macd.slow_period,
-          signalPeriod: data.macd.signal_period
+    export function toJson(
+        stockIndicators?: Record<string, StockIndicator>
+    ): any {
+        if (!stockIndicators) {
+            return {}
+        } else if (stockIndicators.CCI) {
+            return {
+                CCI: {
+                    time_period: stockIndicators.CCI.timePeriod,
+                    overbought: stockIndicators.CCI.overbought,
+                    oversold: stockIndicators.CCI.oversold,
+                },
+            }
+        } else if (stockIndicators.MACD) {
+            return {
+                MACD: {
+                    fast_period: stockIndicators.MACD.fastPeriod,
+                    slow_period: stockIndicators.MACD.slowPeriod,
+                    signal_period: stockIndicators.MACD.signalPeriod,
+                },
+            }
+        } else if (stockIndicators.KDJ) {
+            return {
+                KDJ: {
+                    loopback_period: stockIndicators.KDJ.loopbackPeriod,
+                    signal_period: stockIndicators.KDJ.signalPeriod,
+                    smooth_period: stockIndicators.KDJ.smoothPeriod,
+                },
+            }
         }
-      : null
-
-    const kdj = data.kdj
-      ? {
-          loopbackPeriod: data.kdj.loopback_period,
-          signalPeriod: data.kdj.signal_period,
-          smoothPeriod: data.kdj.smooth_period
-        }
-      : null
-
-    const indicators: List<StockIndicator> = []
-
-    // Add non-null indicators to the array
-    if (cci) indicators.push(cci)
-    if (macd) indicators.push(macd)
-    if (kdj) indicators.push(kdj)
-
-    return indicators
-  }
-  export function toJson(stockIndicator?: StockIndicator[]): any {
-    if (!stockIndicator) {
-      return {}
     }
-
-    const json: any = {}
-
-    // Check if each indicator exists in the array and add it to the JSON object if it does
-    if (stockIndicator.some((indicator) => indicator instanceof CCI)) {
-      json.cci = stockIndicator.find((indicator) => indicator instanceof CCI)
-    }
-
-    if (stockIndicator.some((indicator) => indicator instanceof MACD)) {
-      json.macd = stockIndicator.find((indicator) => indicator instanceof MACD)
-    }
-
-    if (stockIndicator.some((indicator) => indicator instanceof KDJ)) {
-      json.kdj = stockIndicator.find((indicator) => indicator instanceof KDJ)
-    }
-
-    return json
-  }
 }

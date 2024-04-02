@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { Toast } from "bootstrap";
+import { ref, onMounted } from 'vue'
+import { Toast } from 'bootstrap'
 
-const notificationsMessage = ref("Oops, something went wrong...");
+const notificationsMessage = ref('Oops, something went wrong...')
 
 onMounted(() => {
-    const notifications = document.getElementById("notifications");
-    const notificationsToast = Toast.getOrCreateInstance(notifications);
-    notificationsToast.show();
-});
+    const notifications = document.getElementById('notifications')
+    const notificationsToast = Toast.getOrCreateInstance(notifications)
+    notificationsToast.show()
+})
 </script>
 
 <template>
