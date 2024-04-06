@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useStockChartStore } from '@/stores/StockChartStore'
-import { PriceList } from '@/types/PriceList'
-import { Stock } from '@/types/Stock'
+import { PriceList } from '@/classes/PriceList'
+import { Stock } from '@/classes/Stock'
 
 const stockChartStore = useStockChartStore()
-const selectedStock: Stock = computed(() => stockChartStore.selectedStock)
-const priceChange: number = computed(() => stockChartStore.priceChange)
-const percentageChange: number = computed(
+const selectedStock = computed<Stock | undefined>(
+    () => stockChartStore.selectedStock
+)
+const priceChange = computed<number>(() => stockChartStore.priceChange)
+const percentageChange = computed<number>(
     () => stockChartStore.percentageChange
 )
-const priceList = computed(() =>
-    stockChartStore.priceList ? stockChartStore.priceList.slice(-1) : null
+const priceList = computed<PriceList[] | undefined>(() =>
+    stockChartStore.priceList ? stockChartStore.priceList.slice(-1) : undefined
 )
-const lastPrice: PriceList = computed(() =>
-    priceList.value ? priceList.value[0] : null
+const lastPrice = computed<PriceList | undefined>(() =>
+    priceList.value ? priceList.value[0] : undefined
 )
 
 const stockDetailsMap = computed(() => {
@@ -87,7 +89,7 @@ const stockDetailsMap = computed(() => {
         >
             <v-col cols="auto">{{ key }}</v-col>
             <v-col cols="auto"
-                >{{ value.toFixed(3) }}
+                >{{ value!.toFixed(3) }}
                 <span class="text-body-2">MYR</span></v-col
             >
         </v-row>

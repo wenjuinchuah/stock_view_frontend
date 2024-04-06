@@ -1,34 +1,36 @@
 import { defineStore } from 'pinia'
-import { PriceList } from '@/interfaces/PriceList'
-import { Stock } from '@/interfaces/Stock'
+import { PriceList } from '@/classes/PriceList'
+import { Stock } from '@/classes/Stock'
 import HttpService from '@/services/HttpService'
-import { StoreStatus } from '@/enums/StoreStatus'
+import { StoreStatus } from '@/classes/StoreStatus'
 import { ref } from 'vue'
 
 export const useStockChartStore = defineStore('stockChart', () => {
-    const defaultStockCode = ref('0001')
+    const defaultStockCode: string = '0001'
 
     const state = {
-        priceList: ref<List<PriceList>>(),
-        status: ref<StoreStatus>(StoreStatus.isIdle),
+        priceList: ref<PriceList[]>(),
+        status: ref<StoreStatus>(new StoreStatus()),
         selectedStock: ref<Stock>(),
         priceChange: ref<number>(0),
         percentageChange: ref<number>(0),
     }
 
     const actions = {
-        async getStockByStockCode(stockCode: string): Stock {
+        async getStockByStockCode(
+            stockCode: string
+        ): Promise<Stock | undefined> {
             const response = await HttpService.get(
                 `/stock/details/get?stock_code=${stockCode}`
             )
-            return Stock.fromJson(response.data)
+            return Stock.fromJson(response.data) as Stock
         },
         async fetch(
             stockCode: string = state.selectedStock.value
                 ? state.selectedStock.value.stockCode
-                : defaultStockCode.value
-        ) {
-            state.status.value = StoreStatus.isBusy
+                : defaultStockCode
+        ): Promise<void> {
+            state.status.value.setBusy()
             try {
                 const response = await HttpService.get(
                     `/stock/get?stock_code=${stockCode}`
@@ -43,17 +45,13 @@ export const useStockChartStore = defineStore('stockChart', () => {
                 state.percentageChange.value =
                     methods.calculatePercentageChange()
 
-                state.status.value = StoreStatus.isIdle
+                state.status.value.setIdle()
             } catch (error) {
-                state.status.value = StoreStatus.isError
-                throw error
+                state.status.value.setError((error as Error).message)
             }
         },
         isPriceListEmpty() {
-            return (
-                state.priceList.value == null &&
-                state.status.value === StoreStatus.isIdle
-            )
+            return state.priceList.value == null && state.status.value.isIdle()
         },
         updateSelectedStock(stock: Stock) {
             state.selectedStock.value = stock
@@ -62,8 +60,8 @@ export const useStockChartStore = defineStore('stockChart', () => {
 
     const methods = {
         calculatePercentageChange() {
-            const priceList = state.priceList.value
-            if (priceList.length < 2) {
+            const priceList: PriceList[] | undefined = state.priceList.value
+            if (!priceList || priceList.length < 2) {
                 return 0
             }
 
@@ -73,8 +71,8 @@ export const useStockChartStore = defineStore('stockChart', () => {
             return ((latestPrice - previousPrice) / previousPrice) * 100
         },
         calculatePriceChange() {
-            const priceList = state.priceList.value
-            if (priceList.length < 2) {
+            const priceList: PriceList[] | undefined = state.priceList.value
+            if (!priceList || priceList.length < 2) {
                 return 0
             }
 

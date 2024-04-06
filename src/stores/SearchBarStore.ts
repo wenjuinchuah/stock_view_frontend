@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia'
-import { StoreStatus } from '@/enums/StoreStatus'
+import { StoreStatus } from '@/classes/StoreStatus'
 import { ref } from 'vue'
-import { Stock } from '@/interfaces/Stock'
+import { Stock } from '@/classes/Stock'
 import HttpService from '@/services/HttpService'
 import { HttpStatus } from '@/enums/HttpStatus'
 
 export const useSearchBarStore = defineStore('searchBar', () => {
-    let debounceTimeout: NodeJS.Timeout | null = null
+    let debounceTimeout: number | null = null
 
     const state = {
-        status: ref(StoreStatus.isIdle),
-        matchedQuery: ref<List<Stock>>([]),
+        status: ref<StoreStatus>(new StoreStatus()),
+        matchedQuery: ref<Stock[]>([]),
     }
 
     const actions = {
@@ -21,7 +21,7 @@ export const useSearchBarStore = defineStore('searchBar', () => {
 
             debounceTimeout = setTimeout(async () => {
                 if (!value) return false
-                state.status.value = StoreStatus.isBusy
+                state.status.value.setBusy()
                 try {
                     const response = await HttpService.get(
                         `/stock/search?query=${value}`
@@ -29,12 +29,12 @@ export const useSearchBarStore = defineStore('searchBar', () => {
                     if (response.data.status === HttpStatus.ERROR) {
                         throw response.data.message
                     }
-                    state.matchedQuery.value = Stock.fromJson(response.data)
+                    state.matchedQuery.value =
+                        (Stock.fromJson(response.data) as Stock[]) ?? []
 
-                    state.status.value = StoreStatus.isIdle
+                    state.status.value.setIdle()
                 } catch (error) {
-                    state.status.value = StoreStatus.isError
-                    console.error('[SearchBarStore] ', error)
+                    state.status.value.setError((error as Error).message)
                 }
             }, 500)
         },

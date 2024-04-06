@@ -1,12 +1,22 @@
-export interface StockDetails {
+export class StockDetails {
     stockCode: string
     stockName: string
     open: number
     close: number
-}
 
-export namespace StockDetails {
-    export function fromJson(json: any): StockDetails {
+    constructor(
+        stockCode: string,
+        stockName: string,
+        open: number,
+        close: number
+    ) {
+        this.stockCode = stockCode
+        this.stockName = stockName
+        this.open = open
+        this.close = close
+    }
+
+    static fromJson(json: any): StockDetails[] {
         if (Array.isArray(json)) {
             return json.map((item: any) => {
                 return {
@@ -17,12 +27,6 @@ export namespace StockDetails {
                 }
             })
         }
-        const data = json
-        return {
-            stockCode: data.stock_code,
-            stockName: data.stock_name,
-            open: data.open,
-            close: data.close,
-        }
+        return []
     }
 }

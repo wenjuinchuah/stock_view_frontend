@@ -4,10 +4,9 @@ import { useSettingsMenuStore } from '@/stores/SettingsMenuStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import SearchBar from '@/components/SearchBar.vue'
 import StockScreener from '@/components/StockScreener.vue'
-import { StoreStatus } from '@/enums/StoreStatus'
 
 const settingsMenuStore = useSettingsMenuStore()
-const drawerToggled: bool = ref(false)
+const drawerToggled = ref<boolean>(false)
 
 const stockScreenerStore = useStockScreenerStore()
 const screenerResult = computed(() => stockScreenerStore.stockScreener.result)
@@ -99,7 +98,7 @@ const toggleScreener = () => {
             <v-container fluid style="height: 68px"></v-container>
         </template>
 
-        <template v-else-if="stockScreenerStore.status === StoreStatus.isBusy">
+        <template v-else-if="stockScreenerStore.status.isBusy()">
             <v-infinite-scroll></v-infinite-scroll>
         </template>
 

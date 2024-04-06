@@ -4,7 +4,7 @@ import { ref, watch, computed, onMounted } from 'vue'
 
 const store = useAddRuleStore()
 const storeSelectedRules = computed(() => store.selectedRules)
-const selectedRules = ref<List>([])
+const selectedRules = ref<string[]>([])
 
 const confirm = () => {
     store.toggle()
@@ -18,6 +18,7 @@ watch(storeSelectedRules, (value) => {
 })
 
 onMounted(() => {
+    store.fetch()
     selectedRules.value = storeSelectedRules.value
 })
 </script>
@@ -60,6 +61,7 @@ onMounted(() => {
                         menu-icon=""
                         hide-details="auto"
                         :items="Object.keys(store.availableRules)"
+                        :item-title="(item) => item.toUpperCase()"
                         v-model="selectedRules"
                     ></v-autocomplete>
                 </v-col>

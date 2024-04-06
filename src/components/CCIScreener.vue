@@ -1,57 +1,65 @@
 <script setup lang="ts">
-import { CCI } from '@/interfaces/stockIndicator'
+import { CCI } from '@/classes/StockIndicator'
 import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
+
+type Selection = {
+    title: string
+    value: string
+}
 
 const addRuleStore = useAddRuleStore()
-const availableRules = computed(() => addRuleStore.availableRules)
+const availableRules: CCI = addRuleStore.availableRules['CCI'] as CCI
 
 const stockScreenerStore = useStockScreenerStore()
-const screenerSelection = (indicator) =>
-    stockScreenerStore.getScreenerSelection(indicator)
-
-const defaultValue =
-    (stockScreenerStore.stockScreener.stockIndicator &&
-        stockScreenerStore.stockScreener.stockIndicator['CCI']) ??
-    (availableRules.value['CCI']?.value as CCI)
-
-const data = ref<CCI>({
-    timePeriod: defaultValue?.timePeriod || 20,
-    overbought: defaultValue?.overbought || 100,
-    oversold: defaultValue?.oversold || -100,
-})
-
-const select = ref(null)
-const value = ref<number>(0)
-
-watch(select, (newValue) => {
-    if (newValue && newValue.type) {
-        value.value =
-            newValue.type === 'overbought'
-                ? data.value.overbought
-                : data.value.oversold
-    } else {
-        value.value = 0
-    }
-})
-
-watch(value, (newValue) => {
-    if (select.value) {
-        if (select.value.type === 'overbought') {
-            data.value.overbought = newValue
-            data.value.oversold = null
-        } else {
-            data.value.oversold = newValue
-            data.value.overbought = null
-        }
-    }
-})
-
-watch([value, data], () => {
-    stockScreenerStore.updateIndicators({
-        CCI: data.value,
+const stockScreener = computed(() => stockScreenerStore.stockScreener)
+const isSubmit = computed(() => stockScreenerStore.isScreenerSubmit)
+const screenerSelection = (indicator: string): Selection[] => {
+    const cci = stockScreenerStore.getScreenerSelection(indicator)
+    return Object.entries(cci).map(([key, value]) => {
+        return {
+            title: value,
+            value: key,
+        } as Selection
     })
+}
+
+const defaultValue: CCI =
+    stockScreener.value.stockIndicator &&
+    stockScreener.value.stockIndicator['CCI']
+        ? availableRules
+        : {
+              overbought: 100,
+              oversold: -100,
+              timePeriod: 20,
+          }
+
+const selection = ref<Selection>(screenerSelection('CCI')[0])
+const value = ref<number>(
+    selection.value && selection.value.value === 'overbought'
+        ? defaultValue.overbought
+        : defaultValue.oversold
+)
+const periodValue = ref<number>(defaultValue.timePeriod)
+
+watch(selection, (newValue) => {
+    if (newValue.value === 'overbought') {
+        value.value = defaultValue.overbought
+    } else {
+        value.value = defaultValue.oversold
+    }
+})
+
+watchEffect(() => {
+    if (isSubmit.value) {
+        stockScreenerStore.updateIndicator('CCI', {
+            overbought:
+                selection.value.value === 'overbought' ? value.value : null,
+            oversold: selection.value.value === 'oversold' ? value.value : null,
+            timePeriod: periodValue.value,
+        })
+    }
 })
 </script>
 
@@ -65,8 +73,7 @@ watch([value, data], () => {
                 hide-details="auto"
                 menu-icon="expand_more"
                 :items="screenerSelection('CCI')"
-                :item-title="screenerSelection('CCI').title"
-                v-model="select"
+                v-model="selection"
                 return-object
             >
             </v-select>
@@ -91,7 +98,7 @@ watch([value, data], () => {
                 density="compact"
                 hide-details="auto"
                 single-line
-                v-model="data.timePeriod"
+                v-model="periodValue"
             >
             </v-text-field>
         </v-col>

@@ -3,36 +3,33 @@ import { onMounted, onUnmounted, computed, watch, ref } from 'vue'
 import { init, dispose } from 'klinecharts'
 import { useStockChartStore } from '@/stores/StockChartStore'
 import { useSettingsMenuStore } from '@/stores/SettingsMenuStore'
-import { PriceList } from '@/types/PriceList'
-import { Stock } from '@/types/Stock'
 import '@/services/FormatService'
 
 const stockChartStore = useStockChartStore()
 const settingsMenuStore = useSettingsMenuStore()
 
-const priceList: List<PriceList> = computed(() => stockChartStore.priceList)
-const selectedStock: Stock = computed(() => stockChartStore.selectedStock)
+const priceList = computed(() => stockChartStore.priceList)
+const selectedStock = computed(() => stockChartStore.selectedStock)
 const isPriceListEmpty = computed(() => stockChartStore.isPriceListEmpty())
 const isSettingsMenuToggled = computed(() => settingsMenuStore.isToggled)
 
 const stockChart = ref()
 
 const handleResize = () => {
-    if (window.resizeTimer) {
-        clearTimeout(window.resizeTimer)
+    window.onresize = () => {
+        setTimeout(() => {
+            stockChart.value.resize()
+        }, 250)
     }
-    window.resizeTimer = setTimeout(() => {
-        stockChart.value.resize()
-    }, 200)
 }
 
 onMounted(async () => {
-    try {
-        await stockChartStore.fetch()
-        if (!isPriceListEmpty.value) {
-            const chart = init('chart')
+    await stockChartStore.fetch()
+    if (!isPriceListEmpty.value) {
+        const chart = init('chart')
+        if (chart) {
             stockChart.value = chart
-            chart.applyNewData(priceList.value)
+            chart.applyNewData(priceList.value || [])
             chart.setStyles({
                 candle: {
                     tooltip: {
@@ -46,8 +43,6 @@ onMounted(async () => {
             chart.createIndicator('CCI')
             window.addEventListener('resize', handleResize)
         }
-    } catch (error) {
-        console.log(error)
     }
 })
 
@@ -68,17 +63,23 @@ watch(priceList, () => {
 </script>
 
 <template>
-    <div
-        id="stock-info"
-        class="mx-4 mb-4 d-flex column-gap-2 align-items-center"
-        v-if="!isPriceListEmpty && selectedStock"
-    >
-        <p class="font-weight-medium">
-            [{{ selectedStock.stockCode }}] {{ selectedStock.stockName }}
-        </p>
-        <p class="text-grey">{{ selectedStock.stockFullName.capitalize() }}</p>
-    </div>
-    <div id="chart" v-if="!isPriceListEmpty"></div>
+    <template v-if="stockChartStore.status.isBusy()">
+        <v-infinite-scroll></v-infinite-scroll>
+    </template>
+    <template v-if="!isPriceListEmpty && selectedStock">
+        <div
+            id="stock-info"
+            class="mx-4 mb-4 d-flex column-gap-2 align-items-center"
+        >
+            <p class="font-weight-medium">
+                [{{ selectedStock.stockCode }}] {{ selectedStock.stockName }}
+            </p>
+            <p class="text-grey">
+                {{ selectedStock.stockFullName.capitalize() }}
+            </p>
+        </div>
+        <div id="chart"></div>
+    </template>
 </template>
 
 <style>

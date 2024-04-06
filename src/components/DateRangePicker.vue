@@ -12,21 +12,21 @@ const endDateToggled = ref(false)
 const startDate = ref<Date>(initialStartDate ?? null)
 const endDate = ref<Date>(initialEndDate ?? null)
 
-const toggleStartDate = () => {
+const toggleStartDate = (): void => {
     startDateToggled.value = !startDateToggled.value
     if (endDateToggled.value === true) {
         endDateToggled.value = false
     }
 }
 
-const toggleEndDate = () => {
+const toggleEndDate = (): void => {
     endDateToggled.value = !endDateToggled.value
     if (startDateToggled.value === true) {
         startDateToggled.value = false
     }
 }
 
-const allowedStartDate = (date: Date) => {
+function allowedStartDate(date: any): boolean {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
@@ -37,7 +37,7 @@ const allowedStartDate = (date: Date) => {
     }
 }
 
-const allowedEndDate = (date: Date) => {
+const allowedEndDate = (date: any): boolean => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 

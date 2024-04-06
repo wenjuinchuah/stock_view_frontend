@@ -10,10 +10,6 @@ const stockScreenerStore = useStockScreenerStore()
 const startDate = () =>
     new Date(stockScreenerStore.stockScreener.startDate * 1000)
 const endDate = () => new Date(stockScreenerStore.stockScreener.endDate * 1000)
-const screen = () => {
-    stockScreenerStore.toggle()
-    stockScreenerStore.fetch(true)
-}
 
 const addRuleStore = useAddRuleStore()
 const selectedRules = computed(() => addRuleStore.selectedRules)
@@ -23,6 +19,7 @@ const addRule = () => {
 
 onMounted(() => {
     addRuleStore.fetch()
+    stockScreenerStore.getIndicatorSelector()
 })
 </script>
 
@@ -139,7 +136,7 @@ onMounted(() => {
                     <v-btn
                         class="bg-blue-darken-3 ms-4"
                         width="200"
-                        @click.stop="screen"
+                        @click.stop="stockScreenerStore.submit()"
                         type="submit"
                         >Start Screening</v-btn
                     >

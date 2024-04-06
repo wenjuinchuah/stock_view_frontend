@@ -1,54 +1,44 @@
 import { defineStore } from 'pinia'
-import { StoreStatus } from '@/enums/StoreStatus'
+import { StoreStatus } from '@/classes/StoreStatus'
 import { ref } from 'vue'
-import { StockIndicator } from '@/interfaces/StockIndicator'
+import { StockIndicator } from '@/classes/StockIndicator'
+import HttpService from '@/services/HttpService'
+import { HttpStatus } from '@/enums/HttpStatus'
 
 export const useAddRuleStore = defineStore('addRule', () => {
     const state = {
-        status: ref<StoreStatus>(StoreStatus.isIdle),
+        status: ref<StoreStatus>(new StoreStatus()),
         isToggled: ref<boolean>(false),
         availableRules: ref<Record<string, StockIndicator>>({}),
         selectedRules: ref<string[]>([]),
     }
 
     const actions = {
-        fetch() {
+        async fetch() {
             try {
-                state.status.value = StoreStatus.isBusy
-                // fetch something
-                state.availableRules.value = {
-                    CCI: {
-                        timePeriod: 20,
-                        overbought: 100,
-                        oversold: -100,
-                    },
-                    MACD: {
-                        fastPeriod: 12,
-                        slowPeriod: 26,
-                        signalPeriod: 9,
-                    },
-                    KDJ: {
-                        loopbackPeriod: 9,
-                        signalPeriod: 3,
-                        smoothPeriod: 3,
-                    },
+                state.status.value.setBusy()
+                const response = await HttpService.get(
+                    '/stock_screener/available_rules/get'
+                )
+                if (response.data.status === HttpStatus.ERROR) {
+                    throw response.data.message
                 }
-                state.status.value = StoreStatus.isIdle
+                state.availableRules.value = response.data.data
+                state.status.value.setIdle()
             } catch (error) {
-                state.status.value = StoreStatus.isError
-                throw error
+                state.status.value.setError((error as Error).message)
             }
         },
         toggle() {
             state.isToggled.value = !state.isToggled.value
         },
-        addRules(rules: List<string>) {
+        addRules(rules: string[]) {
             state.selectedRules.value = []
             rules.forEach((rule) => {
                 state.selectedRules.value.push(rule)
             })
         },
-        removeRules(rules: List<string>) {
+        removeRules(rules: string[]) {
             const newSelectedRules = state.selectedRules.value.filter(
                 (rule) => !rules.includes(rule)
             )

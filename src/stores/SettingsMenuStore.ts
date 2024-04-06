@@ -1,26 +1,25 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useStockChartStore } from '@/stores/StockChartStore'
-import { StoreStatus } from '@/enums/StoreStatus'
+import { StoreStatus } from '@/classes/StoreStatus'
 
 export const useSettingsMenuStore = defineStore('settingsMenu', () => {
     const stockChartStore = useStockChartStore()
 
     const state = {
         isToggled: ref(false),
-        status: ref<StoreStatus>(StoreStatus.isIdle),
+        status: ref<StoreStatus>(new StoreStatus()),
     }
 
     const actions = {
         async selectStock(stockCode: string) {
-            state.status.value = StoreStatus.isBusy
+            state.status.value.setBusy()
             try {
                 await stockChartStore.fetch(stockCode)
                 // stockChartStore.updateSelectedStock(stock)
-                state.status.value = StoreStatus.isIdle
+                state.status.value.setIdle()
             } catch (error) {
-                state.status.value = StoreStatus.isError
-                console.error(error)
+                state.status.value.setError((error as Error).message)
             }
         },
         toggle() {

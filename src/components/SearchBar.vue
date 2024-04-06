@@ -2,22 +2,23 @@
 import { useSearchBarStore } from '@/stores/SearchBarStore'
 import { useStockChartStore } from '@/stores/StockChartStore'
 import { watch, computed, ref } from 'vue'
-import { StoreStatus } from '@/enums/StoreStatus'
-import { Stock } from '@/interfaces/Stock'
+import { Stock } from '@/classes/Stock'
 
 const searchBarStore = useSearchBarStore()
-const status: StoreStatus = computed(() => searchBarStore.status)
-const matchedQuery: List<Stock> = computed(() => searchBarStore.matchedQuery)
+const matchedQuery = computed<Stock[]>(() => searchBarStore.matchedQuery)
+const storeSelectedStock = computed<Stock | undefined>(
+    () => stockChartStore.selectedStock
+)
 
 const selectedStock = ref<Stock>()
 const stockChartStore = useStockChartStore()
 
 watch(selectedStock, async () => {
     if (
-        selectedStock.value !== stockChartStore.selectedStock.value &&
+        selectedStock.value !== storeSelectedStock.value &&
         selectedStock.value !== null
     ) {
-        stockChartStore.updateSelectedStock(selectedStock.value)
+        stockChartStore.updateSelectedStock(selectedStock.value!)
         try {
             await stockChartStore.fetch()
         } catch (error) {
@@ -41,7 +42,7 @@ watch(selectedStock, async () => {
         hide-details="auto"
         v-model="selectedStock"
         @update:search="searchBarStore.onInput"
-        :loading="status === StoreStatus.isBusy"
+        :loading="searchBarStore.status.isBusy()"
         :items="matchedQuery"
         :filter="searchBarStore.filter"
         :item-title="(item) => `[${item.stockCode}] ${item.stockName}`"
@@ -50,3 +51,4 @@ watch(selectedStock, async () => {
         return-object
     ></v-autocomplete>
 </template>
+@/classes/Stock
