@@ -4,8 +4,11 @@ import { ref } from 'vue'
 import { StockIndicator } from '@/classes/StockIndicator'
 import HttpService from '@/services/HttpService'
 import { HttpStatus } from '@/enums/HttpStatus'
+import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 
 export const useAddRuleStore = defineStore('addRule', () => {
+    const stockScreenerStore = useStockScreenerStore()
+
     const state = {
         status: ref<StoreStatus>(new StoreStatus()),
         isToggled: ref<boolean>(false),
@@ -43,6 +46,7 @@ export const useAddRuleStore = defineStore('addRule', () => {
                 (rule) => !rules.includes(rule)
             )
             state.selectedRules.value = newSelectedRules
+            stockScreenerStore.removeIndicators(rules)
         },
     }
 

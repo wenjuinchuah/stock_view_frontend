@@ -58,7 +58,13 @@ const toggleScreener = () => {
                 </v-col>
             </v-row>
         </v-container>
-        <template v-if="screenerResult && screenerResult.length > 0">
+        <template
+            v-if="
+                stockScreenerStore.status.isIdle() &&
+                screenerResult &&
+                screenerResult.length > 0
+            "
+        >
             <!-- Placeholder -->
             <v-row
                 no-gutters

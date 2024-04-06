@@ -1,26 +1,23 @@
 import { defineStore } from 'pinia'
 import { StoreStatus } from '@/classes/StoreStatus'
 import { StockScreener } from '@/classes/StockScreener'
-import { StockIndicator } from '@/classes/StockIndicator'
 import { ref } from 'vue'
 import HttpService from '@/services/HttpService'
 import { HttpStatus } from '@/enums/HttpStatus'
-import { useAddRuleStore } from '@/stores/AddRuleStore'
 
 export const useStockScreenerStore = defineStore('stockScreener', () => {
     const currentDate = new Date().setHours(0, 0, 0, 0)
-    const addRuleStore = useAddRuleStore()
 
     const state = {
         status: ref<StoreStatus>(new StoreStatus()),
         isToggled: ref<boolean>(false),
         stockScreener: ref<StockScreener>({
-            startDate: currentDate / 1000,
+            startDate: currentDate / 1000 - 86400 * 30,
             endDate: currentDate / 1000,
             stockIndicator: {},
         }),
         indicatorSelector: ref<Record<string, any>>({}),
-        isScreenerSubmit: ref<boolean>(false),
+        isValidate: ref<boolean>(true),
     }
 
     const actions = {
@@ -57,6 +54,11 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
         updateIndicator(indicator: string, value: any) {
             state.stockScreener.value.stockIndicator[indicator] = value
         },
+        removeIndicators(indicators: string[]) {
+            indicators.forEach((indicator) => {
+                delete state.stockScreener.value.stockIndicator[indicator]
+            })
+        },
         async getIndicatorSelector() {
             try {
                 state.status.value.setBusy()
@@ -74,25 +76,8 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
         },
         submit() {
             actions.toggle()
-            state.isScreenerSubmit.value = true
-            if (
-                Object.keys(state.stockScreener.value.stockIndicator).length ===
-                addRuleStore.selectedRules.length
-            ) {
-                actions.fetch()
-                console.log(
-                    'success',
-                    Object.keys(state.stockScreener.value.stockIndicator)
-                        .length,
-                    addRuleStore.selectedRules.length
-                )
-            } else {
-                console.log(
-                    'failed',
-                    Object.keys(state.stockScreener.value.stockIndicator)
-                        .length,
-                    addRuleStore.selectedRules.length
-                )
+            if (state.isValidate.value) {
+                actions.fetch(true)
             }
         },
     }

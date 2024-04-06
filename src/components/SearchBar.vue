@@ -22,7 +22,7 @@ watch(selectedStock, async () => {
         try {
             await stockChartStore.fetch()
         } catch (error) {
-            console.error(error)
+            searchBarStore.status.setError((error as Error).message)
         }
     }
 })

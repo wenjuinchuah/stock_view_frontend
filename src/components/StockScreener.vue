@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { useAddRuleStore } from '@/stores/AddRuleStore'
+import { useCCIScreenerStore } from '@/stores/CCIScreenerStore'
 import DateRangePicker from '@/components/DateRangePicker.vue'
 import AddRule from '@/components/AddRule.vue'
 import CCIScreener from '@/components/CCIScreener.vue'
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, watch } from 'vue'
 
 const stockScreenerStore = useStockScreenerStore()
 const startDate = () =>
@@ -20,6 +21,26 @@ const addRule = () => {
 onMounted(() => {
     addRuleStore.fetch()
     stockScreenerStore.getIndicatorSelector()
+})
+
+watch(selectedRules, () => {
+    const screenerStores: any[] = []
+    selectedRules.value.forEach((value) => {
+        if (value === 'CCI') {
+            screenerStores.push(useCCIScreenerStore())
+        }
+        // other screener stores
+    })
+    if (selectedRules.value.length === 0) {
+        stockScreenerStore.isValidate = true
+    } else {
+        screenerStores.forEach((store) => {
+            const isValidate = computed(() => store.isValidate)
+            watch(isValidate, () => {
+                stockScreenerStore.isValidate = isValidate.value
+            })
+        })
+    }
 })
 </script>
 
@@ -137,6 +158,7 @@ onMounted(() => {
                         class="bg-blue-darken-3 ms-4"
                         width="200"
                         @click.stop="stockScreenerStore.submit()"
+                        :disabled="!stockScreenerStore.isValidate"
                         type="submit"
                         >Start Screening</v-btn
                     >
