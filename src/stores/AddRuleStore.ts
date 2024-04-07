@@ -24,7 +24,7 @@ export const useAddRuleStore = defineStore('addRule', () => {
                     '/stock_screener/available_rules/get'
                 )
                 if (response.data.status === HttpStatus.ERROR) {
-                    throw response.data.message
+                    throw response.data
                 }
                 state.availableRules.value = response.data.data
                 state.status.value.setIdle()

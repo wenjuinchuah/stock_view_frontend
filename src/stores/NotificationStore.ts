@@ -24,7 +24,7 @@ export const useNotificationStore = defineStore('notification', () => {
                     newStatus.error,
                     true
                 )
-                state.notifications.value.push(notification)
+                state.notification.value = notification
                 state.toggle.value = true
             }
         })
@@ -32,7 +32,7 @@ export const useNotificationStore = defineStore('notification', () => {
 
     const state = {
         toggle: ref<boolean>(false),
-        notifications: ref<Notification[]>([]),
+        notification: ref<Notification>(),
     }
 
     const actions = {

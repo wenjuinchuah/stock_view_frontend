@@ -85,11 +85,13 @@ const updateEndDate = (date: Date) => {
             class="start-date-picker"
             bg-color="white"
             color="blue-darken-2"
+            mode-icon="expand_more"
             hide-header
             elevation="5"
             :allowed-dates="allowedStartDate"
             v-model="startDate"
             @update:modelValue="updateStartDate"
+            v-click-outside="toggleStartDate"
         />
 
         <v-icon icon="arrow_right_alt" class="mx-2"></v-icon>
@@ -105,11 +107,13 @@ const updateEndDate = (date: Date) => {
             class="end-date-picker"
             bg-color="white"
             color="blue-darken-2"
+            mode-icon="expand_more"
             hide-header
             elevation="5"
             :allowed-dates="allowedEndDate"
             v-model="endDate"
             @update:modelValue="updateEndDate"
+            v-click-outside="toggleEndDate"
         />
     </div>
 </template>

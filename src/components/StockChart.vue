@@ -34,8 +34,8 @@ onMounted(async () => {
                 candle: {
                     tooltip: {
                         text: {
-                            marginTop: 32,
-                            marginLeft: 24,
+                            marginTop: 54,
+                            marginLeft: 16,
                         },
                     },
                 },
@@ -67,17 +67,15 @@ watch(priceList, () => {
         <v-infinite-scroll></v-infinite-scroll>
     </template>
     <template v-if="!isPriceListEmpty && selectedStock">
-        <div
-            id="stock-info"
-            class="mx-4 mb-4 d-flex column-gap-2 align-items-center"
-        >
-            <p class="font-weight-medium">
-                [{{ selectedStock.stockCode }}] {{ selectedStock.stockName }}
-            </p>
-            <p class="text-grey">
+        <v-container class="pa-0 mx-4 bg-white" id="stock-info">
+            <v-row no-gutters class="font-weight-medium">
+                [{{ selectedStock.stockCode }}]
+                {{ selectedStock.stockName }}
+            </v-row>
+            <v-row no-gutters class="text-grey">
                 {{ selectedStock.stockFullName.capitalize() }}
-            </p>
-        </div>
+            </v-row>
+        </v-container>
         <div id="chart"></div>
     </template>
 </template>
@@ -96,6 +94,6 @@ main {
 
 #stock-info {
     position: absolute;
-    z-index: 2;
+    z-index: 10000;
 }
 </style>

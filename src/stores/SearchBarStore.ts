@@ -27,7 +27,7 @@ export const useSearchBarStore = defineStore('searchBar', () => {
                         `/stock/search?query=${value}`
                     )
                     if (response.data.status === HttpStatus.ERROR) {
-                        throw response.data.message
+                        throw response.data
                     }
                     state.matchedQuery.value =
                         (Stock.fromJson(response.data) as Stock[]) ?? []

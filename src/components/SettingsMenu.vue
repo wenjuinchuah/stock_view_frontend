@@ -27,7 +27,7 @@ const toggleScreener = () => {
         prepend-icon="settings"
         variant="outlined"
         @click.stop="toggleSettingsMenu"
-        class="mt-4 mx-5 px-4 position-absolute end-0 bg-white"
+        class="mt-4 mx-5 px-4 bg-white"
         >Settings
     </v-btn>
     <v-navigation-drawer
@@ -36,12 +36,14 @@ const toggleScreener = () => {
         location="right"
         width="280"
     >
-        <v-btn
-            icon="close"
-            variant="plain"
-            @click.stop="toggleSettingsMenu"
-        ></v-btn>
-        <SearchBar />
+        <template v-slot:prepend>
+            <v-btn
+                icon="close"
+                variant="plain"
+                @click.stop="toggleSettingsMenu"
+            ></v-btn>
+            <SearchBar />
+        </template>
         <v-container class="py-0">
             <v-row no-gutters justify="space-between">
                 <v-col cols="auto" align-self="center">
@@ -101,7 +103,6 @@ const toggleScreener = () => {
                     </v-list-item-title>
                 </v-list-item>
             </v-list>
-            <v-container fluid style="height: 68px"></v-container>
         </template>
 
         <template v-else-if="stockScreenerStore.status.isBusy()">
@@ -122,20 +123,20 @@ const toggleScreener = () => {
             </v-row>
         </template>
         <StockScreener />
-        <div class="position-absolute bottom-0 bg-white" style="width: 280px">
-            <!-- Chart Settings -->
-            <v-row no-gutters class="p-3"
-                ><v-btn
+        <!-- Chart Settings -->
+        <template v-slot:append>
+            <div class="ma-4">
+                <v-btn
                     block
-                    id="settingsBtn"
+                    bottom
                     prepend-icon="settings"
                     variant="outlined"
                     @click.stop=""
                     class="bg-white"
                     >Chart Settings
                 </v-btn>
-            </v-row>
-        </div>
+            </div>
+        </template>
     </v-navigation-drawer>
 </template>
 
@@ -143,5 +144,12 @@ const toggleScreener = () => {
 .v-btn {
     z-index: 10;
     text-transform: unset !important;
+}
+
+#settingsBtn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1000;
 }
 </style>

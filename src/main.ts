@@ -1,9 +1,4 @@
-import './assets/main.css'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
-
-// Bootstrap
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap-icons/font/bootstrap-icons.css'
 
 // Vuetify
 import 'vuetify/styles'
