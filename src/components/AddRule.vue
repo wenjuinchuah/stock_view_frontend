@@ -8,13 +8,11 @@ const selectedRules = ref<string[]>([])
 
 const confirm = () => {
     store.toggle()
-    store.addRules(selectedRules.value)
+    store.updateRules(selectedRules.value)
 }
 
-watch(storeSelectedRules, (value) => {
-    if (value) {
-        selectedRules.value = value
-    }
+watch(storeSelectedRules, (newRules) => {
+    selectedRules.value = newRules
 })
 
 onMounted(() => {

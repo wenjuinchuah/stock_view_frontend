@@ -4,12 +4,15 @@ import { useSettingsMenuStore } from '@/stores/SettingsMenuStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import SearchBar from '@/components/SearchBar.vue'
 import StockScreener from '@/components/StockScreener.vue'
+import type { StockDetails } from '@/classes/StockDetails'
 
 const settingsMenuStore = useSettingsMenuStore()
 const drawerToggled = ref<boolean>(false)
 
 const stockScreenerStore = useStockScreenerStore()
-const screenerResult = computed(() => stockScreenerStore.stockScreener.result)
+const screenerResult = computed<StockDetails[]>(
+    () => stockScreenerStore.screenerResult
+)
 
 const toggleSettingsMenu = () => {
     settingsMenuStore.toggle()
@@ -18,6 +21,12 @@ const toggleSettingsMenu = () => {
 
 const toggleScreener = () => {
     stockScreenerStore.toggle()
+}
+
+const loadMore = (entry: IntersectionObserverEntry) => {
+    if (entry && stockScreenerStore.stockScreener.lastStockCode !== '9997') {
+        stockScreenerStore.fetch()
+    }
 }
 </script>
 
@@ -60,13 +69,7 @@ const toggleScreener = () => {
                 </v-col>
             </v-row>
         </v-container>
-        <template
-            v-if="
-                stockScreenerStore.status.isIdle() &&
-                screenerResult &&
-                screenerResult.length > 0
-            "
-        >
+        <template v-if="screenerResult.length > 0">
             <!-- Placeholder -->
             <v-row
                 no-gutters
@@ -101,15 +104,46 @@ const toggleScreener = () => {
                             }}</v-col>
                         </v-row>
                     </v-list-item-title>
+                    <v-list-item-subtitle>
+                        {{ stockDetails.stockCode }}
+                    </v-list-item-subtitle>
                 </v-list-item>
             </v-list>
+            <template
+                v-if="
+                    stockScreenerStore.status.isIdle() &&
+                    stockScreenerStore.stockScreener.lastStockCode !== '9997'
+                "
+            >
+                <v-row no-gutters>
+                    <v-col class="text-center" v-intersect="loadMore">
+                        Load more...
+                    </v-col>
+                </v-row>
+            </template>
+            <template v-else-if="stockScreenerStore.status.isBusy()">
+                <v-infinite-scroll></v-infinite-scroll>
+            </template>
+            <template
+                v-else-if="
+                    stockScreenerStore.stockScreener.lastStockCode === '9997'
+                "
+            >
+                <v-row no-gutters>
+                    <v-col class="text-center">No more stock</v-col>
+                </v-row>
+            </template>
         </template>
 
-        <template v-else-if="stockScreenerStore.status.isBusy()">
+        <template
+            v-else-if="
+                stockScreenerStore.status.isBusy() && screenerResult.length == 0
+            "
+        >
             <v-infinite-scroll></v-infinite-scroll>
         </template>
 
-        <template v-else>
+        <template v-else-if="screenerResult.length == 0">
             <v-img
                 :src="'/assets/svgs/search_not_found.svg'"
                 alt="search no found"

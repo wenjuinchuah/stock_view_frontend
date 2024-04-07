@@ -68,7 +68,7 @@ watch(
         </v-col>
         <v-spacer></v-spacer>
     </v-row>
-    <v-row no-gutters class="text-center" justify="space-between">
+    <v-row no-gutters class="text-center mb-3" justify="space-between">
         <v-col cols="auto" align-self="center" class="ml-4">Period</v-col>
         <v-col cols="1" class="ml-4">
             <v-text-field

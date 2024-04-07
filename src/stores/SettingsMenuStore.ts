@@ -16,7 +16,6 @@ export const useSettingsMenuStore = defineStore('settingsMenu', () => {
             state.status.value.setBusy()
             try {
                 await stockChartStore.fetch(stockCode)
-                // stockChartStore.updateSelectedStock(stock)
                 state.status.value.setIdle()
             } catch (error) {
                 state.status.value.setError((error as Error).message)

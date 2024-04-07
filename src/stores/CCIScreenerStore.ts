@@ -55,7 +55,7 @@ export const useCCIScreenerStore = defineStore('cciScreener', () => {
                 timePeriod,
                 overbought,
                 oversold,
-            })
+            } as CCI)
         },
     }
 

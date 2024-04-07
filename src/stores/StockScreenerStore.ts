@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { StoreStatus } from '@/classes/StoreStatus'
 import { StockScreener } from '@/classes/StockScreener'
+import { StockDetails } from '@/classes/StockDetails'
 import { ref } from 'vue'
 import HttpService from '@/services/HttpService'
 import { HttpStatus } from '@/enums/HttpStatus'
@@ -16,6 +17,7 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
             endDate: currentDate / 1000,
             stockIndicator: {},
         }),
+        screenerResult: ref<StockDetails[]>([]),
         indicatorSelector: ref<Record<string, any>>({}),
         isValidate: ref<boolean>(true),
     }
@@ -24,6 +26,7 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
         async fetch(refresh: boolean = false) {
             if (refresh) {
                 state.stockScreener.value.lastStockCode = undefined
+                state.screenerResult.value = []
             }
             state.status.value.setBusy()
             try {
@@ -37,6 +40,9 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                 state.stockScreener.value = StockScreener.fromJson(
                     response.data
                 )
+                state.stockScreener.value.result?.forEach((stockDetails) => {
+                    state.screenerResult.value.push(stockDetails)
+                })
                 state.status.value.setIdle()
             } catch (error) {
                 state.status.value.setError((error as Error).message)

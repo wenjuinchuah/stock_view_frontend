@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, computed, watch, ref } from 'vue'
-import { init, dispose } from 'klinecharts'
+import { init, dispose, type Chart } from 'klinecharts'
 import { useStockChartStore } from '@/stores/StockChartStore'
 import { useSettingsMenuStore } from '@/stores/SettingsMenuStore'
 import '@/services/FormatService'
+import type { PriceList } from '@/classes/PriceList'
 
 const stockChartStore = useStockChartStore()
 const settingsMenuStore = useSettingsMenuStore()
@@ -13,12 +14,14 @@ const selectedStock = computed(() => stockChartStore.selectedStock)
 const isPriceListEmpty = computed(() => stockChartStore.isPriceListEmpty())
 const isSettingsMenuToggled = computed(() => settingsMenuStore.isToggled)
 
-const stockChart = ref()
+const stockChart = computed<Chart | undefined>(() => stockChartStore.stockChart)
 
 const handleResize = () => {
     window.onresize = () => {
         setTimeout(() => {
-            stockChart.value.resize()
+            if (stockChart.value) {
+                stockChart.value.resize()
+            }
         }, 250)
     }
 }
@@ -28,7 +31,7 @@ onMounted(async () => {
     if (!isPriceListEmpty.value) {
         const chart = init('chart')
         if (chart) {
-            stockChart.value = chart
+            stockChartStore.setChart(chart)
             chart.applyNewData(priceList.value || [])
             chart.setStyles({
                 candle: {
@@ -40,7 +43,6 @@ onMounted(async () => {
                     },
                 },
             })
-            chart.createIndicator('CCI')
             window.addEventListener('resize', handleResize)
         }
     }
@@ -52,12 +54,16 @@ onUnmounted(() => {
 })
 
 watch(isSettingsMenuToggled, () => {
-    setTimeout(() => stockChart.value.resize(), 400)
+    setTimeout(() => {
+        if (stockChart.value) {
+            stockChart.value.resize()
+        }
+    }, 400)
 })
 
 watch(priceList, () => {
     if (stockChart.value) {
-        stockChart.value.applyNewData(priceList.value)
+        stockChart.value.applyNewData(priceList.value as PriceList[])
     }
 })
 </script>

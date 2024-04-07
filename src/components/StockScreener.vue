@@ -2,9 +2,13 @@
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useCCIScreenerStore } from '@/stores/CCIScreenerStore'
+import { useMACDScreenerStore } from '@/stores/MACDScreenerStore'
+import { useKDJScreenerStore } from '@/stores/KDJScreenerStore'
 import DateRangePicker from '@/components/DateRangePicker.vue'
 import AddRule from '@/components/AddRule.vue'
 import CCIScreener from '@/components/CCIScreener.vue'
+import MACDScreener from '@/components/MACDScreener.vue'
+import KDJScreener from '@/components/KDJScreener.vue'
 import { onMounted, computed, watch } from 'vue'
 
 const stockScreenerStore = useStockScreenerStore()
@@ -29,7 +33,12 @@ watch(selectedRules, () => {
         if (value === 'CCI') {
             screenerStores.push(useCCIScreenerStore())
         }
-        // other screener stores
+        if (value === 'MACD') {
+            screenerStores.push(useMACDScreenerStore())
+        }
+        if (value === 'KDJ') {
+            screenerStores.push(useKDJScreenerStore())
+        }
     })
     if (selectedRules.value.length === 0) {
         stockScreenerStore.isValidate = true
@@ -48,7 +57,6 @@ watch(selectedRules, () => {
     <v-form @submit.prevent validate-on="submit">
         <v-dialog
             max-width="800"
-            max-height="700"
             v-model="stockScreenerStore.isToggled"
             scrollable
         >
@@ -102,11 +110,11 @@ watch(selectedRules, () => {
                     <div class="m-4">
                         <v-row no-gutters justify="space-between">
                             <v-col cols="auto"
-                                ><v-card-text class="py-0 text-blue-darken-2"
+                                ><v-card-text class="text-blue-darken-2"
                                     >AND</v-card-text
                                 ></v-col
                             >
-                            <v-col cols="auto"
+                            <v-col cols="auto" align-self="center"
                                 ><v-btn
                                     class="text-decoration-underline"
                                     variant="text"
@@ -123,10 +131,10 @@ watch(selectedRules, () => {
                             <CCIScreener />
                         </template>
                         <template v-else-if="value === 'MACD'">
-                            <!-- <MACDScreener /> -->
+                            <MACDScreener />
                         </template>
                         <template v-else-if="value === 'KDJ'">
-                            <!-- <KDJScreener /> -->
+                            <KDJScreener />
                         </template>
                     </div>
                 </template>
@@ -158,7 +166,7 @@ watch(selectedRules, () => {
                         class="bg-blue-darken-3 ms-4"
                         width="200"
                         @click.stop="stockScreenerStore.submit()"
-                        :disabled="!stockScreenerStore.isValidate"
+                        :disabled="!stockScreenerStore.isValidate || stockScreenerStore.status.isBusy()"
                         type="submit"
                         >Start Screening</v-btn
                     >

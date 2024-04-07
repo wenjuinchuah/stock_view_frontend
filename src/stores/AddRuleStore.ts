@@ -35,11 +35,8 @@ export const useAddRuleStore = defineStore('addRule', () => {
         toggle() {
             state.isToggled.value = !state.isToggled.value
         },
-        addRules(rules: string[]) {
-            state.selectedRules.value = []
-            rules.forEach((rule) => {
-                state.selectedRules.value.push(rule)
-            })
+        updateRules(rules: string[]) {
+            state.selectedRules.value = rules
         },
         removeRules(rules: string[]) {
             const newSelectedRules = state.selectedRules.value.filter(

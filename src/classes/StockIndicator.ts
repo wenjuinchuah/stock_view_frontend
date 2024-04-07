@@ -68,12 +68,22 @@ export class MACD extends StockIndicator {
     fastPeriod: number
     slowPeriod: number
     signalPeriod: number
+    bearish: boolean
+    bullish: boolean
 
-    constructor(fastPeriod: number, slowPeriod: number, signalPeriod: number) {
+    constructor(
+        fastPeriod: number,
+        slowPeriod: number,
+        signalPeriod: number,
+        bearish: boolean,
+        bullish: boolean
+    ) {
         super()
         this.fastPeriod = fastPeriod
         this.slowPeriod = slowPeriod
         this.signalPeriod = signalPeriod
+        this.bearish = bearish
+        this.bullish = bullish
     }
 
     static fromJson(json: any): Record<string, MACD> {
@@ -81,6 +91,8 @@ export class MACD extends StockIndicator {
             fastPeriod: json.fast_period,
             slowPeriod: json.slow_period,
             signalPeriod: json.signal_period,
+            bearish: json.bearish,
+            bullish: json.bullish,
         }
     }
 
@@ -90,6 +102,8 @@ export class MACD extends StockIndicator {
             fast_period: macd.fastPeriod,
             slow_period: macd.slowPeriod,
             signal_period: macd.signalPeriod,
+            bearish: macd.bearish,
+            bullish: macd.bullish,
         }
     }
 }
@@ -98,16 +112,23 @@ export class KDJ extends StockIndicator {
     loopbackPeriod: number
     signalPeriod: number
     smoothPeriod: number
+    goldenCross: boolean
+    deadCross: boolean
 
     constructor(
         loopbackPeriod: number,
         signalPeriod: number,
-        smoothPeriod: number
+        smoothPeriod: number,
+        goldenCross: boolean,
+        deadCross: boolean
+
     ) {
         super()
         this.loopbackPeriod = loopbackPeriod
         this.signalPeriod = signalPeriod
         this.smoothPeriod = smoothPeriod
+        this.goldenCross = goldenCross
+        this.deadCross = deadCross
     }
 
     static fromJson(json: any): Record<string, KDJ> {
@@ -115,6 +136,8 @@ export class KDJ extends StockIndicator {
             loopbackPeriod: json.loopback_period,
             signalPeriod: json.signal_period,
             smoothPeriod: json.smooth_period,
+            goldenCross: json.golden_cross,
+            deadCross: json.dead_cross,
         }
     }
 
@@ -124,6 +147,8 @@ export class KDJ extends StockIndicator {
             loopback_period: kdj.loopbackPeriod,
             signal_period: kdj.signalPeriod,
             smooth_period: kdj.smoothPeriod,
+            golden_cross: kdj.goldenCross,
+            dead_cross: kdj.deadCross,
         }
     }
 }

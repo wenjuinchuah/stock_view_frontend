@@ -4,9 +4,12 @@ import { Stock } from '@/classes/Stock'
 import HttpService from '@/services/HttpService'
 import { StoreStatus } from '@/classes/StoreStatus'
 import { ref } from 'vue'
+import type { Chart } from 'klinecharts'
+import { useAddRuleStore } from './AddRuleStore'
 
 export const useStockChartStore = defineStore('stockChart', () => {
     const defaultStockCode: string = '0001'
+    const addRuleStore = useAddRuleStore()
 
     const state = {
         priceList: ref<PriceList[]>(),
@@ -14,6 +17,8 @@ export const useStockChartStore = defineStore('stockChart', () => {
         selectedStock: ref<Stock>(),
         priceChange: ref<number>(0),
         percentageChange: ref<number>(0),
+        stockChart: ref<Chart>(),
+        indicatorPaneDetails: ref<Map<string, string>>(new Map()),
     }
 
     const actions = {
@@ -45,6 +50,8 @@ export const useStockChartStore = defineStore('stockChart', () => {
                 state.percentageChange.value =
                     methods.calculatePercentageChange()
 
+                actions.updateChartIndicators()
+
                 state.status.value.setIdle()
             } catch (error) {
                 state.status.value.setError((error as Error).message)
@@ -55,6 +62,40 @@ export const useStockChartStore = defineStore('stockChart', () => {
         },
         updateSelectedStock(stock: Stock) {
             state.selectedStock.value = stock
+        },
+        setChart(chart: Chart) {
+            state.stockChart.value = chart
+        },
+        updateChartIndicators() {
+            if (state.stockChart.value) {
+                const selectedRules: string[] = addRuleStore.selectedRules
+
+                // Remove indicators that are not selected
+                state.indicatorPaneDetails.value.forEach((paneId, rule) => {
+                    console.log(paneId, rule)
+                    if (
+                        !selectedRules.includes(rule) ||
+                        selectedRules.length === 0
+                    ) {
+                        state.stockChart.value!.removeIndicator(paneId, rule)
+                        state.indicatorPaneDetails.value.delete(rule)
+                    }
+                })
+
+                // Add indicators that are selected
+                selectedRules.forEach((rule) => {
+                    const paneId: string =
+                        state.stockChart.value!.createIndicator(rule) ?? ''
+
+                    if (state.indicatorPaneDetails.value.has(rule)) {
+                        const oldPaneId: string =
+                            state.indicatorPaneDetails.value.get(rule) ?? ''
+                        state.stockChart.value!.removeIndicator(oldPaneId, rule)
+                    }
+
+                    state.indicatorPaneDetails.value.set(rule, paneId)
+                })
+            }
         },
     }
 
