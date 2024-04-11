@@ -4,12 +4,14 @@ import { Stock } from '@/classes/Stock'
 import HttpService from '@/services/HttpService'
 import { StoreStatus } from '@/classes/StoreStatus'
 import { ref } from 'vue'
-import type { Chart } from 'klinecharts'
+import { registerIndicator, type Chart, type Overlay } from 'klinecharts'
 import { useAddRuleStore } from './AddRuleStore'
+import { useStockScreenerStore } from './StockScreenerStore'
 
 export const useStockChartStore = defineStore('stockChart', () => {
     const defaultStockCode: string = '0001'
     const addRuleStore = useAddRuleStore()
+    const stockScreenerStore = useStockScreenerStore()
 
     const state = {
         priceList: ref<PriceList[]>(),
@@ -22,6 +24,20 @@ export const useStockChartStore = defineStore('stockChart', () => {
     }
 
     const actions = {
+        async init(chart: Chart) {
+            state.status.value.setBusy()
+
+            state.stockChart.value = chart
+            await actions.fetch()
+
+            if (state.stockChart.value && state.priceList.value) {
+                state.stockChart.value.applyNewData(
+                    state.priceList.value as PriceList[]
+                )
+            }
+            // Register the timeframe indicator
+            // methods.addTimeframeIndicator()
+        },
         async getStockByStockCode(
             stockCode: string
         ): Promise<Stock | undefined> {
@@ -43,28 +59,29 @@ export const useStockChartStore = defineStore('stockChart', () => {
                 state.priceList.value = PriceList.fromJson(response.data)
                 state.priceList.value.sort((a, b) => a.timestamp - b.timestamp)
 
+                if (state.priceList.value && state.stockChart.value) {
+                    state.stockChart.value.applyNewData(
+                        state.priceList.value as PriceList[]
+                    )
+                }
+
                 state.selectedStock.value =
                     await actions.getStockByStockCode(stockCode)
 
+                // Methods
                 state.priceChange.value = methods.calculatePriceChange()
                 state.percentageChange.value =
                     methods.calculatePercentageChange()
-
                 actions.updateChartIndicators()
+                state.stockChart.value?.resize()
 
                 state.status.value.setIdle()
             } catch (error) {
                 state.status.value.setError((error as Error).message)
             }
         },
-        isPriceListEmpty() {
-            return state.priceList.value == null && state.status.value.isIdle()
-        },
         updateSelectedStock(stock: Stock) {
             state.selectedStock.value = stock
-        },
-        setChart(chart: Chart) {
-            state.stockChart.value = chart
         },
         updateChartIndicators() {
             if (state.stockChart.value) {
@@ -72,7 +89,6 @@ export const useStockChartStore = defineStore('stockChart', () => {
 
                 // Remove indicators that are not selected
                 state.indicatorPaneDetails.value.forEach((paneId, rule) => {
-                    console.log(paneId, rule)
                     if (
                         !selectedRules.includes(rule) ||
                         selectedRules.length === 0
@@ -86,6 +102,16 @@ export const useStockChartStore = defineStore('stockChart', () => {
                 selectedRules.forEach((rule) => {
                     const paneId: string =
                         state.stockChart.value!.createIndicator(rule) ?? ''
+                    // state.stockChart.value!.createIndicator('timeframe', true, {
+                    //     id: paneId,
+                    // })
+                    if (rule === 'KDJ') {
+                        state.stockChart.value!.createIndicator(
+                            'marking',
+                            true,
+                            { id: paneId }
+                        )
+                    }
 
                     if (state.indicatorPaneDetails.value.has(rule)) {
                         const oldPaneId: string =
@@ -121,6 +147,81 @@ export const useStockChartStore = defineStore('stockChart', () => {
             const previousPrice = priceList[priceList.length - 2].close
 
             return latestPrice - previousPrice
+        },
+        addTimeframeIndicator() {
+            registerIndicator({
+                name: 'marking',
+                shortName: '',
+                calc: (kLineDataList) => kLineDataList,
+                draw: ({
+                    ctx,
+                    kLineDataList,
+                    indicator,
+                    visibleRange,
+                    bounding,
+                    barSpace,
+                    defaultStyles,
+                    xAxis,
+                    yAxis,
+                }) => {
+                    const { from, to } = visibleRange
+                    const result = indicator.result
+
+                    let previous_k = null
+                    let previous_d = null
+
+                    for (let i = from; i < to; i++) {
+                        const data = result[i]
+                        const x = xAxis.convertToPixel(i)
+                        const y = yAxis.convertToPixel(data.close)
+
+                        // Check if the current data point is within the screening timeframe
+                        const within_date_range =
+                            new Date(data.timestamp).getTime() >=
+                                new Date(
+                                    stockScreenerStore.stockScreener.startDate
+                                ).getTime() &&
+                            new Date(data.timestamp).getTime() <=
+                                new Date(
+                                    stockScreenerStore.stockScreener.endDate
+                                ).getTime()
+
+                        if (
+                            within_date_range &&
+                            previous_k !== null &&
+                            previous_d !== null
+                        ) {
+                            const golden_cross_condition =
+                                data.d < data.k &&
+                                data.d < data.j &&
+                                previous_k < previous_d &&
+                                previous_d < data.d
+                            const dead_cross_condition =
+                                data.d > data.k &&
+                                data.d > data.j &&
+                                previous_k > previous_d &&
+                                previous_d > data.d
+
+                            // Mark the data point if it matches the golden cross or dead cross condition
+                            if (
+                                golden_cross_condition ||
+                                dead_cross_condition
+                            ) {
+                                ctx.beginPath()
+                                ctx.arc(x, y, 5, 0, 2 * Math.PI, false)
+                                ctx.fillStyle = golden_cross_condition
+                                    ? 'gold'
+                                    : 'black'
+                                ctx.fill()
+                            }
+                        }
+
+                        previous_k = data.k
+                        previous_d = data.d
+                    }
+                    return false
+                },
+            })
         },
     }
 

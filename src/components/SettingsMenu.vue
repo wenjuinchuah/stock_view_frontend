@@ -2,9 +2,13 @@
 import { ref, computed } from 'vue'
 import { useSettingsMenuStore } from '@/stores/SettingsMenuStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
+import { useChartSettingsStore } from '@/stores/ChartSettingsStore'
 import SearchBar from '@/components/SearchBar.vue'
 import StockScreener from '@/components/StockScreener.vue'
+import ChartSettings from '@/components/ChartSettings.vue'
 import type { StockDetails } from '@/classes/StockDetails'
+
+const chartSettingsStore = useChartSettingsStore()
 
 const settingsMenuStore = useSettingsMenuStore()
 const drawerToggled = ref<boolean>(false)
@@ -122,7 +126,8 @@ const loadMore = (entry: IntersectionObserverEntry) => {
                 </v-row>
             </template>
             <template v-else-if="stockScreenerStore.status.isBusy()">
-                <v-infinite-scroll></v-infinite-scroll>
+                <v-skeleton-loader type="list-item-two-line">
+                </v-skeleton-loader>
             </template>
             <template
                 v-else-if="
@@ -139,8 +144,10 @@ const loadMore = (entry: IntersectionObserverEntry) => {
             v-else-if="
                 stockScreenerStore.status.isBusy() && screenerResult.length == 0
             "
+            v-for="i in 5"
+            :key="i"
         >
-            <v-infinite-scroll></v-infinite-scroll>
+            <v-skeleton-loader type="list-item-two-line"></v-skeleton-loader>
         </template>
 
         <template v-else-if="screenerResult.length == 0">
@@ -165,12 +172,13 @@ const loadMore = (entry: IntersectionObserverEntry) => {
                     bottom
                     prepend-icon="settings"
                     variant="outlined"
-                    @click.stop=""
+                    @click.stop="chartSettingsStore.toggle"
                     class="bg-white"
                     >Chart Settings
                 </v-btn>
             </div>
         </template>
+        <ChartSettings />
     </v-navigation-drawer>
 </template>
 

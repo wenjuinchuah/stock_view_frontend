@@ -3,6 +3,7 @@ import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { ref, watch, computed, onMounted } from 'vue'
 
 const store = useAddRuleStore()
+const availableRules = computed(() => store.availableRules)
 const storeSelectedRules = computed(() => store.selectedRules)
 const selectedRules = ref<string[]>([])
 
@@ -58,8 +59,9 @@ onMounted(() => {
                         variant="outlined"
                         menu-icon=""
                         hide-details="auto"
-                        :items="Object.keys(store.availableRules)"
-                        :item-title="(item) => item.toUpperCase()"
+                        :disabled="availableRules?.size === 0"
+                        :items="Array.from(availableRules ?? [])"
+                        :item-title="(item) => item[0].toUpperCase()"
                         v-model="selectedRules"
                     ></v-autocomplete>
                 </v-col>

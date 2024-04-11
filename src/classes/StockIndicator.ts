@@ -1,36 +1,30 @@
 export abstract class StockIndicator {
-    static fromJson(json: any): Record<string, StockIndicator> {
+    static fromJson(json: any): Map<string, StockIndicator> {
+        const indicators = new Map<string, StockIndicator>()
         if (json.cci) {
-            return {
-                CCI: CCI.fromJson(json.cci),
-            }
-        } else if (json.macd) {
-            return {
-                MACD: MACD.fromJson(json.macd),
-            }
-        } else if (json.kdj) {
-            return {
-                KDJ: KDJ.fromJson(json.kdj),
-            }
+            indicators.set('CCI', CCI.fromJson(json.cci))
         }
-        return {}
+        if (json.macd) {
+            indicators.set('MACD', MACD.fromJson(json.macd))
+        }
+        if (json.kdj) {
+            indicators.set('KDJ', KDJ.fromJson(json.kdj))
+        }
+        return indicators
     }
 
-    static toJson(stockIndicators: Record<string, StockIndicator>): any {
-        if (stockIndicators.CCI) {
-            return {
-                cci: CCI.toJson(stockIndicators),
-            }
-        } else if (stockIndicators.MACD) {
-            return {
-                macd: MACD.toJson(stockIndicators),
-            }
-        } else if (stockIndicators.KDJ) {
-            return {
-                kdj: KDJ.toJson(stockIndicators),
-            }
+    static toJson(stockIndicators: Map<string, StockIndicator>): any {
+        const json: any = {}
+        if (stockIndicators.get('CCI')) {
+            json.cci = CCI.toJson(stockIndicators.get('CCI') as CCI)
         }
-        return {}
+        if (stockIndicators.get('MACD')) {
+            json.macd = MACD.toJson(stockIndicators.get('MACD') as MACD)
+        }
+        if (stockIndicators.get('KDJ')) {
+            json.kdj = KDJ.toJson(stockIndicators.get('KDJ') as KDJ)
+        }
+        return json
     }
 }
 
@@ -46,16 +40,11 @@ export class CCI extends StockIndicator {
         this.oversold = oversold
     }
 
-    static fromJson(json: any): Record<string, CCI> {
-        return {
-            timePeriod: json.time_period,
-            overbought: json.overbought,
-            oversold: json.oversold,
-        }
+    static fromJson(json: any): any {
+        return new CCI(json.time_period, json.overbought, json.oversold)
     }
 
-    static toJson(stockIndicator: Record<string, StockIndicator>): any {
-        const cci = stockIndicator.CCI as CCI
+    static toJson(cci: any): any {
         return {
             time_period: cci.timePeriod,
             overbought: cci.overbought,
@@ -86,18 +75,17 @@ export class MACD extends StockIndicator {
         this.bullish = bullish
     }
 
-    static fromJson(json: any): Record<string, MACD> {
-        return {
-            fastPeriod: json.fast_period,
-            slowPeriod: json.slow_period,
-            signalPeriod: json.signal_period,
-            bearish: json.bearish,
-            bullish: json.bullish,
-        }
+    static fromJson(json: any): any {
+        return new MACD(
+            json.fast_period,
+            json.slow_period,
+            json.signal_period,
+            json.bearish,
+            json.bullish
+        )
     }
 
-    static toJson(stockIndicator: Record<string, StockIndicator>): any {
-        const macd = stockIndicator.MACD as MACD
+    static toJson(macd: any): any {
         return {
             fast_period: macd.fastPeriod,
             slow_period: macd.slowPeriod,
@@ -121,7 +109,6 @@ export class KDJ extends StockIndicator {
         smoothPeriod: number,
         goldenCross: boolean,
         deadCross: boolean
-
     ) {
         super()
         this.loopbackPeriod = loopbackPeriod
@@ -131,18 +118,17 @@ export class KDJ extends StockIndicator {
         this.deadCross = deadCross
     }
 
-    static fromJson(json: any): Record<string, KDJ> {
-        return {
-            loopbackPeriod: json.loopback_period,
-            signalPeriod: json.signal_period,
-            smoothPeriod: json.smooth_period,
-            goldenCross: json.golden_cross,
-            deadCross: json.dead_cross,
-        }
+    static fromJson(json: any): any {
+        return new KDJ(
+            json.loopback_period,
+            json.signal_period,
+            json.smooth_period,
+            json.golden_cross,
+            json.dead_cross
+        )
     }
 
-    static toJson(stockIndicator: Record<string, StockIndicator>): any {
-        const kdj = stockIndicator.KDJ as KDJ
+    static toJson(kdj: any): any {
         return {
             loopback_period: kdj.loopbackPeriod,
             signal_period: kdj.signalPeriod,

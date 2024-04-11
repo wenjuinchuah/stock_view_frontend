@@ -7,15 +7,16 @@ import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 
 export const useCCIScreenerStore = defineStore('cciScreener', () => {
     const addRuleStore = useAddRuleStore()
-    const availableRules: CCI = addRuleStore.availableRules['CCI'] as CCI
+    const availableRules: CCI = addRuleStore.availableRules?.get('CCI') as CCI
 
     const stockScreenerStore = useStockScreenerStore()
     const stockScreener = computed(() => stockScreenerStore.stockScreener)
 
     watch(stockScreener, () => {
-        if (stockScreener.value.stockIndicator.CCI) {
-            state.defaultValue.value = stockScreener.value.stockIndicator
-                .CCI as CCI
+        if (stockScreener.value.stockIndicator.has('CCI')) {
+            state.defaultValue.value = stockScreener.value.stockIndicator.get(
+                'CCI'
+            ) as CCI
         }
     })
 

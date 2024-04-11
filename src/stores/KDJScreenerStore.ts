@@ -7,15 +7,16 @@ import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 
 export const useKDJScreenerStore = defineStore('kdjScreener', () => {
     const addRuleStore = useAddRuleStore()
-    const availableRules: KDJ = addRuleStore.availableRules['KDJ'] as KDJ
+    const availableRules: KDJ = addRuleStore.availableRules?.get('KDJ') as KDJ
 
     const stockScreenerStore = useStockScreenerStore()
     const stockScreener = computed(() => stockScreenerStore.stockScreener)
 
     watch(stockScreener, () => {
-        if (stockScreener.value.stockIndicator.KDJ) {
-            state.defaultValue.value = stockScreener.value.stockIndicator
-                .KDJ as KDJ
+        if (stockScreener.value.stockIndicator.has('KDJ')) {
+            state.defaultValue.value = stockScreener.value.stockIndicator.get(
+                'KDJ'
+            ) as KDJ
         }
     })
 

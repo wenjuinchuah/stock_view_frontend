@@ -12,7 +12,7 @@ export const useAddRuleStore = defineStore('addRule', () => {
     const state = {
         status: ref<StoreStatus>(new StoreStatus()),
         isToggled: ref<boolean>(false),
-        availableRules: ref<Record<string, StockIndicator>>({}),
+        availableRules: ref<Map<string, StockIndicator>>(),
         selectedRules: ref<string[]>([]),
     }
 
@@ -26,7 +26,9 @@ export const useAddRuleStore = defineStore('addRule', () => {
                 if (response.data.status === HttpStatus.ERROR) {
                     throw response.data
                 }
-                state.availableRules.value = response.data.data
+                state.availableRules.value = new Map(
+                    Object.entries(response.data.data)
+                )
                 state.status.value.setIdle()
             } catch (error) {
                 state.status.value.setError((error as Error).message)

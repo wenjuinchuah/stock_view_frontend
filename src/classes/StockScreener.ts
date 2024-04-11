@@ -4,7 +4,7 @@ import { StockDetails } from '@/classes/StockDetails'
 export class StockScreener {
     startDate: number
     endDate: number
-    stockIndicator: Record<string, StockIndicator> = {}
+    stockIndicator: Map<string, StockIndicator>
     lastStockCode?: string
     pageSize?: number = 20
     result?: StockDetails[]
@@ -12,7 +12,7 @@ export class StockScreener {
     constructor(
         startDate: number,
         endDate: number,
-        stockIndicator: Record<string, StockIndicator>,
+        stockIndicator: Map<string, StockIndicator>,
         lastStockCode: string,
         pageSize: number,
         result: StockDetails[]
@@ -42,7 +42,7 @@ export class StockScreener {
             start_date: stockScreener.startDate,
             end_date: stockScreener.endDate,
             stock_indicator: StockIndicator.toJson(
-                stockScreener.stockIndicator ?? {}
+                stockScreener.stockIndicator
             ),
             last_stock_code: stockScreener.lastStockCode,
             page_size: stockScreener.pageSize ?? 20,

@@ -23,6 +23,11 @@ export const useSettingsMenuStore = defineStore('settingsMenu', () => {
         },
         toggle() {
             state.isToggled.value = !state.isToggled.value
+            setTimeout(() => {
+                if (stockChartStore.stockChart) {
+                    stockChartStore.stockChart.resize()
+                }
+            }, 250)
         },
     }
 

@@ -18,9 +18,6 @@ const endDate = () => new Date(stockScreenerStore.stockScreener.endDate * 1000)
 
 const addRuleStore = useAddRuleStore()
 const selectedRules = computed(() => addRuleStore.selectedRules)
-const addRule = () => {
-    addRuleStore.toggle()
-}
 
 onMounted(() => {
     addRuleStore.fetch()
@@ -144,7 +141,7 @@ watch(selectedRules, () => {
                         block
                         prepend-icon="add"
                         variant="outlined"
-                        @click.stop="addRule"
+                        @click.stop="addRuleStore.toggle"
                         style="border-style: dashed"
                         height="65"
                         >Add new rules

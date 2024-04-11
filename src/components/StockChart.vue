@@ -1,19 +1,15 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, computed, watch, ref } from 'vue'
-import { init, dispose, type Chart } from 'klinecharts'
+import { onMounted, onUnmounted, computed } from 'vue'
+import { init, dispose, type Chart, utils } from 'klinecharts'
 import { useStockChartStore } from '@/stores/StockChartStore'
-import { useSettingsMenuStore } from '@/stores/SettingsMenuStore'
 import '@/services/FormatService'
-import type { PriceList } from '@/classes/PriceList'
+import type { Stock } from '@/classes/Stock'
 
 const stockChartStore = useStockChartStore()
-const settingsMenuStore = useSettingsMenuStore()
 
-const priceList = computed(() => stockChartStore.priceList)
-const selectedStock = computed(() => stockChartStore.selectedStock)
-const isPriceListEmpty = computed(() => stockChartStore.isPriceListEmpty())
-const isSettingsMenuToggled = computed(() => settingsMenuStore.isToggled)
-
+const selectedStock = computed<Stock | undefined>(
+    () => stockChartStore.selectedStock
+)
 const stockChart = computed<Chart | undefined>(() => stockChartStore.stockChart)
 
 const handleResize = () => {
@@ -27,44 +23,48 @@ const handleResize = () => {
 }
 
 onMounted(async () => {
-    await stockChartStore.fetch()
-    if (!isPriceListEmpty.value) {
-        const chart = init('chart')
-        if (chart) {
-            stockChartStore.setChart(chart)
-            chart.applyNewData(priceList.value || [])
-            chart.setStyles({
+    if (!stockChart.value) {
+        const chart = init('chart', {
+            customApi: {
+                formatDate: (
+                    dateTimeFormat: Intl.DateTimeFormat,
+                    timestamp: number
+                ) => {
+                    return utils.formatDate(
+                        dateTimeFormat,
+                        timestamp,
+                        'YYYY-MM-DD'
+                    )
+                },
+            },
+            styles: {
                 candle: {
                     tooltip: {
+                        custom: [
+                            { title: 'Date: ', value: '{time}' },
+                            { title: 'open', value: '{open}' },
+                            { title: 'high', value: '{high}' },
+                            { title: 'low', value: '{low}' },
+                            { title: 'close', value: '{close}' },
+                            { title: 'volume', value: '{volume}' },
+                        ],
                         text: {
                             marginTop: 54,
                             marginLeft: 16,
                         },
                     },
                 },
-            })
-            window.addEventListener('resize', handleResize)
-        }
+            },
+        })
+        await stockChartStore.init(chart as Chart)
+
+        window.addEventListener('resize', handleResize)
     }
 })
 
 onUnmounted(() => {
-    dispose('chart')
+    dispose(stockChartStore.stockChart as Chart)
     window.removeEventListener('resize', handleResize)
-})
-
-watch(isSettingsMenuToggled, () => {
-    setTimeout(() => {
-        if (stockChart.value) {
-            stockChart.value.resize()
-        }
-    }, 400)
-})
-
-watch(priceList, () => {
-    if (stockChart.value) {
-        stockChart.value.applyNewData(priceList.value as PriceList[])
-    }
 })
 </script>
 
@@ -72,7 +72,7 @@ watch(priceList, () => {
     <template v-if="stockChartStore.status.isBusy()">
         <v-infinite-scroll></v-infinite-scroll>
     </template>
-    <template v-if="!isPriceListEmpty && selectedStock">
+    <template v-else-if="stockChartStore.status.isIdle() && selectedStock">
         <v-container class="pa-0 mx-4 bg-white" id="stock-info">
             <v-row no-gutters class="font-weight-medium">
                 [{{ selectedStock.stockCode }}]
@@ -82,8 +82,8 @@ watch(priceList, () => {
                 {{ selectedStock.stockFullName.capitalize() }}
             </v-row>
         </v-container>
-        <div id="chart"></div>
     </template>
+    <div id="chart"></div>
 </template>
 
 <style>

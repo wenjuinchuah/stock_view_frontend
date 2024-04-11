@@ -5,6 +5,7 @@ import { StockDetails } from '@/classes/StockDetails'
 import { ref } from 'vue'
 import HttpService from '@/services/HttpService'
 import { HttpStatus } from '@/enums/HttpStatus'
+import type { StockIndicator } from '@/classes/StockIndicator'
 
 export const useStockScreenerStore = defineStore('stockScreener', () => {
     const currentDate = new Date().setHours(0, 0, 0, 0)
@@ -15,10 +16,10 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
         stockScreener: ref<StockScreener>({
             startDate: currentDate / 1000 - 86400 * 30,
             endDate: currentDate / 1000,
-            stockIndicator: {},
+            stockIndicator: new Map<string, StockIndicator>(),
         }),
         screenerResult: ref<StockDetails[]>([]),
-        indicatorSelector: ref<Record<string, any>>({}),
+        indicatorSelector: ref<Map<string, any>>(),
         isValidate: ref<boolean>(true),
     }
 
@@ -58,11 +59,11 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
             state.stockScreener.value.endDate = date.getTime() / 1000
         },
         updateIndicator(indicator: string, value: any) {
-            state.stockScreener.value.stockIndicator[indicator] = value
+            state.stockScreener.value.stockIndicator.set(indicator, value)
         },
         removeIndicators(indicators: string[]) {
             indicators.forEach((indicator) => {
-                delete state.stockScreener.value.stockIndicator[indicator]
+                state.stockScreener.value.stockIndicator.delete(indicator)
             })
         },
         async getIndicatorSelector() {
@@ -71,14 +72,19 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                 const response = await HttpService.get(
                     '/stock_screener/indicator_selector/get'
                 )
-                state.indicatorSelector.value = response.data.data
+                if (response.data.status === HttpStatus.ERROR) {
+                    throw response.data
+                }
+                state.indicatorSelector.value = new Map(
+                    Object.entries(response.data.data)
+                )
                 state.status.value.setIdle()
             } catch (error) {
                 state.status.value.setError((error as Error).message)
             }
         },
         getScreenerSelection(indicator: string) {
-            return state.indicatorSelector.value[indicator.toLowerCase()]
+            return state.indicatorSelector.value?.get(indicator.toLowerCase())
         },
         submit() {
             actions.toggle()
