@@ -12,13 +12,13 @@ export const useChartSettingsStore = defineStore('chartSettings', () => {
     }
 
     const actions = {
-        toggle() {
+        toggle(): void {
             state.isToggled.value = !state.isToggled.value
         },
-        updateIndicators(indicators: string[]) {
+        updateIndicators(indicators: string[]): void {
             state.indicators.value = indicators
         },
-        removeIndicators(indicators: string[]) {
+        removeIndicators(indicators: string[]): void {
             const newSelectedIndicators = state.indicators.value.filter(
                 (indicator) => !indicators.includes(indicator)
             )

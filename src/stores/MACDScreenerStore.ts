@@ -4,6 +4,7 @@ import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { MACD } from '@/classes/StockIndicator'
 import type { ScreenerSelection } from '@/classes/ScreenerSelection'
+import { StockScreener } from '@/classes/StockScreener'
 
 export const useMACDScreenerStore = defineStore('macdScreener', () => {
     const addRuleStore = useAddRuleStore()
@@ -12,7 +13,9 @@ export const useMACDScreenerStore = defineStore('macdScreener', () => {
     ) as MACD
 
     const stockScreenerStore = useStockScreenerStore()
-    const stockScreener = computed(() => stockScreenerStore.stockScreener)
+    const stockScreener = computed<StockScreener>(
+        () => stockScreenerStore.stockScreener
+    )
 
     watch(stockScreener, () => {
         if (stockScreener.value.stockIndicator.has('MACD')) {
@@ -39,6 +42,7 @@ export const useMACDScreenerStore = defineStore('macdScreener', () => {
     const actions = {
         screenerSelection(): ScreenerSelection[] {
             const macd = stockScreenerStore.getScreenerSelection('MACD')
+            if (!macd) return []
             return Object.entries(macd).map(([key, value]) => {
                 return {
                     title: value,
@@ -51,7 +55,7 @@ export const useMACDScreenerStore = defineStore('macdScreener', () => {
             fastPeriod: number,
             slowPeriod: number,
             signalPeriod: number
-        ) {
+        ): void {
             const bearish = selectionType === 'bearish'
             const bullish = selectionType === 'bullish'
             stockScreenerStore.updateIndicator('MACD', {

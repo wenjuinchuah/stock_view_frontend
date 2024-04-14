@@ -14,7 +14,7 @@ export const useSearchBarStore = defineStore('searchBar', () => {
     }
 
     const actions = {
-        async onInput(value: string) {
+        async onInput(value: string): Promise<void> {
             if (debounceTimeout) {
                 clearTimeout(debounceTimeout)
             }
@@ -38,7 +38,7 @@ export const useSearchBarStore = defineStore('searchBar', () => {
                 }
             }, 500)
         },
-        filter(item: Stock, query: string) {
+        filter(item: Stock, query: string): boolean {
             return (
                 item.stockName.toLowerCase().includes(query.toLowerCase()) ||
                 item.stockCode.includes(query.toLowerCase())

@@ -17,7 +17,7 @@ export const useAddRuleStore = defineStore('addRule', () => {
     }
 
     const actions = {
-        async fetch() {
+        async fetch(): Promise<void> {
             try {
                 state.status.value.setBusy()
                 const response = await HttpService.get(
@@ -34,13 +34,13 @@ export const useAddRuleStore = defineStore('addRule', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
-        toggle() {
+        toggle(): void {
             state.isToggled.value = !state.isToggled.value
         },
-        updateRules(rules: string[]) {
+        updateRules(rules: string[]): void {
             state.selectedRules.value = rules
         },
-        removeRules(rules: string[]) {
+        removeRules(rules: string[]): void {
             const newSelectedRules = state.selectedRules.value.filter(
                 (rule) => !rules.includes(rule)
             )

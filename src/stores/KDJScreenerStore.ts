@@ -4,13 +4,16 @@ import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { KDJ } from '@/classes/StockIndicator'
 import type { ScreenerSelection } from '@/classes/ScreenerSelection'
+import { StockScreener } from '@/classes/StockScreener'
 
 export const useKDJScreenerStore = defineStore('kdjScreener', () => {
     const addRuleStore = useAddRuleStore()
     const availableRules: KDJ = addRuleStore.availableRules?.get('KDJ') as KDJ
 
     const stockScreenerStore = useStockScreenerStore()
-    const stockScreener = computed(() => stockScreenerStore.stockScreener)
+    const stockScreener = computed<StockScreener>(
+        () => stockScreenerStore.stockScreener
+    )
 
     watch(stockScreener, () => {
         if (stockScreener.value.stockIndicator.has('KDJ')) {
@@ -37,6 +40,7 @@ export const useKDJScreenerStore = defineStore('kdjScreener', () => {
     const actions = {
         screenerSelection(): ScreenerSelection[] {
             const kdj = stockScreenerStore.getScreenerSelection('KDJ')
+            if (!kdj) return []
             return Object.entries(kdj).map(([key, value]) => {
                 return {
                     title: value,
@@ -49,7 +53,7 @@ export const useKDJScreenerStore = defineStore('kdjScreener', () => {
             loopbackPeriod: number,
             signalPeriod: number,
             smoothPeriod: number
-        ) {
+        ): void {
             const goldenCross = selectionType === 'golden_cross'
             const deadCross = selectionType === 'dead_cross'
             stockScreenerStore.updateIndicator('KDJ', {

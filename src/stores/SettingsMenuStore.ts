@@ -7,12 +7,12 @@ export const useSettingsMenuStore = defineStore('settingsMenu', () => {
     const stockChartStore = useStockChartStore()
 
     const state = {
-        isToggled: ref(false),
+        isToggled: ref<boolean>(false),
         status: ref<StoreStatus>(new StoreStatus()),
     }
 
     const actions = {
-        async selectStock(stockCode: string) {
+        async selectStock(stockCode: string): Promise<void> {
             state.status.value.setBusy()
             try {
                 await stockChartStore.fetch(stockCode)
@@ -21,7 +21,7 @@ export const useSettingsMenuStore = defineStore('settingsMenu', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
-        toggle() {
+        toggle(): void {
             state.isToggled.value = !state.isToggled.value
             setTimeout(() => {
                 if (stockChartStore.stockChart) {

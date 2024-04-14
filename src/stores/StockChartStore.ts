@@ -4,14 +4,12 @@ import { Stock } from '@/classes/Stock'
 import HttpService from '@/services/HttpService'
 import { StoreStatus } from '@/classes/StoreStatus'
 import { ref } from 'vue'
-import { registerIndicator, type Chart, type Overlay } from 'klinecharts'
+import { type Chart } from 'klinecharts'
 import { useAddRuleStore } from './AddRuleStore'
-import { useStockScreenerStore } from './StockScreenerStore'
 
 export const useStockChartStore = defineStore('stockChart', () => {
     const defaultStockCode: string = '0001'
     const addRuleStore = useAddRuleStore()
-    const stockScreenerStore = useStockScreenerStore()
 
     const state = {
         priceList: ref<PriceList[]>(),
@@ -24,7 +22,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
     }
 
     const actions = {
-        async init(chart: Chart) {
+        async init(chart: Chart): Promise<void> {
             state.status.value.setBusy()
 
             state.stockChart.value = chart
@@ -35,8 +33,6 @@ export const useStockChartStore = defineStore('stockChart', () => {
                     state.priceList.value as PriceList[]
                 )
             }
-            // Register the timeframe indicator
-            // methods.addTimeframeIndicator()
         },
         async getStockByStockCode(
             stockCode: string
@@ -80,10 +76,10 @@ export const useStockChartStore = defineStore('stockChart', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
-        updateSelectedStock(stock: Stock) {
+        updateSelectedStock(stock: Stock): void {
             state.selectedStock.value = stock
         },
-        updateChartIndicators() {
+        updateChartIndicators(): void {
             if (state.stockChart.value) {
                 const selectedRules: string[] = addRuleStore.selectedRules
 
@@ -126,7 +122,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
     }
 
     const methods = {
-        calculatePercentageChange() {
+        calculatePercentageChange(): number {
             const priceList: PriceList[] | undefined = state.priceList.value
             if (!priceList || priceList.length < 2) {
                 return 0
@@ -137,7 +133,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
 
             return ((latestPrice - previousPrice) / previousPrice) * 100
         },
-        calculatePriceChange() {
+        calculatePriceChange(): number {
             const priceList: PriceList[] | undefined = state.priceList.value
             if (!priceList || priceList.length < 2) {
                 return 0
@@ -147,81 +143,6 @@ export const useStockChartStore = defineStore('stockChart', () => {
             const previousPrice = priceList[priceList.length - 2].close
 
             return latestPrice - previousPrice
-        },
-        addTimeframeIndicator() {
-            registerIndicator({
-                name: 'marking',
-                shortName: '',
-                calc: (kLineDataList) => kLineDataList,
-                draw: ({
-                    ctx,
-                    kLineDataList,
-                    indicator,
-                    visibleRange,
-                    bounding,
-                    barSpace,
-                    defaultStyles,
-                    xAxis,
-                    yAxis,
-                }) => {
-                    const { from, to } = visibleRange
-                    const result = indicator.result
-
-                    let previous_k = null
-                    let previous_d = null
-
-                    for (let i = from; i < to; i++) {
-                        const data = result[i]
-                        const x = xAxis.convertToPixel(i)
-                        const y = yAxis.convertToPixel(data.close)
-
-                        // Check if the current data point is within the screening timeframe
-                        const within_date_range =
-                            new Date(data.timestamp).getTime() >=
-                                new Date(
-                                    stockScreenerStore.stockScreener.startDate
-                                ).getTime() &&
-                            new Date(data.timestamp).getTime() <=
-                                new Date(
-                                    stockScreenerStore.stockScreener.endDate
-                                ).getTime()
-
-                        if (
-                            within_date_range &&
-                            previous_k !== null &&
-                            previous_d !== null
-                        ) {
-                            const golden_cross_condition =
-                                data.d < data.k &&
-                                data.d < data.j &&
-                                previous_k < previous_d &&
-                                previous_d < data.d
-                            const dead_cross_condition =
-                                data.d > data.k &&
-                                data.d > data.j &&
-                                previous_k > previous_d &&
-                                previous_d > data.d
-
-                            // Mark the data point if it matches the golden cross or dead cross condition
-                            if (
-                                golden_cross_condition ||
-                                dead_cross_condition
-                            ) {
-                                ctx.beginPath()
-                                ctx.arc(x, y, 5, 0, 2 * Math.PI, false)
-                                ctx.fillStyle = golden_cross_condition
-                                    ? 'gold'
-                                    : 'black'
-                                ctx.fill()
-                            }
-                        }
-
-                        previous_k = data.k
-                        previous_d = data.d
-                    }
-                    return false
-                },
-            })
         },
     }
 

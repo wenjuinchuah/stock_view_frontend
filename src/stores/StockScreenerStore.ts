@@ -8,7 +8,7 @@ import { HttpStatus } from '@/enums/HttpStatus'
 import type { StockIndicator } from '@/classes/StockIndicator'
 
 export const useStockScreenerStore = defineStore('stockScreener', () => {
-    const currentDate = new Date().setHours(0, 0, 0, 0)
+    const currentDate: number = new Date().setHours(0, 0, 0, 0)
 
     const state = {
         status: ref<StoreStatus>(new StoreStatus()),
@@ -24,7 +24,7 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
     }
 
     const actions = {
-        async fetch(refresh: boolean = false) {
+        async fetch(refresh: boolean = false): Promise<void> {
             if (refresh) {
                 state.stockScreener.value.lastStockCode = undefined
                 state.screenerResult.value = []
@@ -49,24 +49,24 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
-        toggle() {
+        toggle(): void {
             state.isToggled.value = !state.isToggled.value
         },
-        startDateChange(date: Date) {
+        startDateChange(date: Date): void {
             state.stockScreener.value.startDate = date.getTime() / 1000
         },
-        endDateChange(date: Date) {
+        endDateChange(date: Date): void {
             state.stockScreener.value.endDate = date.getTime() / 1000
         },
-        updateIndicator(indicator: string, value: any) {
+        updateIndicator(indicator: string, value: any): void {
             state.stockScreener.value.stockIndicator.set(indicator, value)
         },
-        removeIndicators(indicators: string[]) {
+        removeIndicators(indicators: string[]): void {
             indicators.forEach((indicator) => {
                 state.stockScreener.value.stockIndicator.delete(indicator)
             })
         },
-        async getIndicatorSelector() {
+        async getIndicatorSelector(): Promise<void> {
             try {
                 state.status.value.setBusy()
                 const response = await HttpService.get(
@@ -83,10 +83,10 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
-        getScreenerSelection(indicator: string) {
+        getScreenerSelection(indicator: string): StockIndicator | undefined {
             return state.indicatorSelector.value?.get(indicator.toLowerCase())
         },
-        submit() {
+        submit(): void {
             actions.toggle()
             if (state.isValidate.value) {
                 actions.fetch(true)
