@@ -4,44 +4,36 @@ import { Notification } from '@/classes/Notification'
 import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { useSearchBarStore } from '@/stores/SearchBarStore'
-import { useSettingsMenuStore } from '@/stores/SettingsMenuStore'
 import { useStockChartStore } from '@/stores/StockChartStore'
+import { useDashboardViewStore } from './DashboardViewStore'
 
 export const useNotificationStore = defineStore('notification', () => {
     const stores = [
         useAddRuleStore(),
         useStockScreenerStore(),
         useSearchBarStore(),
-        useSettingsMenuStore(),
         useStockChartStore(),
+        useDashboardViewStore(),
     ]
 
     for (const store of stores) {
         watch(store.status, (newStatus) => {
             if (newStatus.isError()) {
-                const notification = new Notification(
-                    actions.getCurrentDate(),
-                    newStatus.error,
-                    true
-                )
+                const notification = new Notification(newStatus.error, true)
                 state.notification.value = notification
-                state.toggle.value = true
+                actions.toggle()
             }
         })
     }
 
     const state = {
-        toggle: ref<boolean>(false),
+        isToggled: ref<boolean>(false),
         notification: ref<Notification>(),
     }
 
     const actions = {
-        getCurrentDate(): string {
-            const date = new Date()
-            return date.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-            })
+        toggle(): void {
+            state.isToggled.value = !state.isToggled.value
         },
     }
 

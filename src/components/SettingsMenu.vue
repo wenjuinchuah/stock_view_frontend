@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useSettingsMenuStore } from '@/stores/SettingsMenuStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { useChartSettingsStore } from '@/stores/ChartSettingsStore'
@@ -9,23 +9,12 @@ import ChartSettings from '@/components/ChartSettings.vue'
 import type { StockDetails } from '@/classes/StockDetails'
 
 const chartSettingsStore = useChartSettingsStore()
-
 const settingsMenuStore = useSettingsMenuStore()
-const drawerToggled = ref<boolean>(false)
 
 const stockScreenerStore = useStockScreenerStore()
 const screenerResult = computed<StockDetails[]>(
     () => stockScreenerStore.screenerResult
 )
-
-const toggleSettingsMenu = () => {
-    settingsMenuStore.toggle()
-    drawerToggled.value = !drawerToggled.value
-}
-
-const toggleScreener = () => {
-    stockScreenerStore.toggle()
-}
 
 const loadMore = (entry: IntersectionObserverEntry) => {
     if (entry && stockScreenerStore.stockScreener.lastStockCode !== '9997') {
@@ -35,46 +24,53 @@ const loadMore = (entry: IntersectionObserverEntry) => {
 </script>
 
 <template>
+    <!-- Settings button -->
     <v-btn
         id="settingsBtn"
         prepend-icon="settings"
         variant="outlined"
-        @click.stop="toggleSettingsMenu"
+        @click.stop="settingsMenuStore.toggle"
         class="mt-4 mx-5 px-4 bg-white"
         >Settings
     </v-btn>
+
+    <!-- Navigation drawer -->
     <v-navigation-drawer
-        v-model="drawerToggled"
+        v-model="settingsMenuStore.isToggled"
         permanent
         location="right"
-        width="280"
+        width="300"
     >
+        <!-- Close drawer button & Search bar -->
         <template v-slot:prepend>
             <v-btn
                 icon="close"
                 variant="plain"
-                @click.stop="toggleSettingsMenu"
+                @click.stop="settingsMenuStore.toggle"
             ></v-btn>
             <SearchBar />
         </template>
+
+        <!-- Stock screener -->
         <v-container class="py-0">
             <v-row no-gutters justify="space-between">
                 <v-col cols="auto" align-self="center">
-                    <p class="font-weight-medium m-0">Stock Screener</p>
+                    <p class="font-weight-medium m-0">Stock Screener ({{ screenerResult.length }})</p>
                 </v-col>
                 <v-col cols="auto">
                     <v-btn
                         variant="text"
                         class="text-blue-darken-3"
                         id="edit"
-                        @click.stop="toggleScreener"
+                        @click.stop="stockScreenerStore.toggle"
                         >Edit</v-btn
                     >
                 </v-col>
             </v-row>
         </v-container>
+
+        <!-- Stock screener result while idle and result length > 0-->
         <template v-if="screenerResult.length > 0">
-            <!-- Placeholder -->
             <v-row
                 no-gutters
                 justify="space-between"
@@ -84,6 +80,7 @@ const loadMore = (entry: IntersectionObserverEntry) => {
                 <v-col cols="3">Open</v-col>
                 <v-col cols="3">Close</v-col>
             </v-row>
+
             <!-- Render stock information -->
             <v-list lines="one">
                 <v-list-item
@@ -97,6 +94,7 @@ const loadMore = (entry: IntersectionObserverEntry) => {
                         settingsMenuStore.selectStock(stockDetails.stockCode)
                     "
                 >
+                    <!-- List title -->
                     <v-list-item-title>
                         <v-row no-gutters justify="space-between">
                             <v-col cols="6">{{ stockDetails.stockName }}</v-col>
@@ -108,41 +106,39 @@ const loadMore = (entry: IntersectionObserverEntry) => {
                             }}</v-col>
                         </v-row>
                     </v-list-item-title>
+
+                    <!-- List subtitle  -->
                     <v-list-item-subtitle>
                         {{ stockDetails.stockCode }}
                     </v-list-item-subtitle>
                 </v-list-item>
             </v-list>
+
+            <!-- Show skeleton loader -->
+            <template v-if="stockScreenerStore.status.isBusy()">
+                <v-skeleton-loader type="list-item-two-line">
+                </v-skeleton-loader>
+            </template>
+
+            <!-- Show load more text -->
             <template
-                v-if="
-                    stockScreenerStore.status.isIdle() &&
+                v-else-if="
                     stockScreenerStore.stockScreener.lastStockCode !== '9997'
                 "
             >
                 <v-row no-gutters>
-                    <v-col class="text-center" v-intersect="loadMore">
+                    <v-col class="text-center text-grey-darken-2" v-intersect="loadMore">
                         Load more...
                     </v-col>
                 </v-row>
             </template>
-            <template v-else-if="stockScreenerStore.status.isBusy()">
-                <v-skeleton-loader type="list-item-two-line">
-                </v-skeleton-loader>
-            </template>
-            <template
-                v-else-if="
-                    stockScreenerStore.stockScreener.lastStockCode === '9997'
-                "
-            >
-                <v-row no-gutters>
-                    <v-col class="text-center">No more stock</v-col>
-                </v-row>
-            </template>
         </template>
 
+        <!-- Show skeleton loader while busy -->
         <template
             v-else-if="
-                stockScreenerStore.status.isBusy() && screenerResult.length == 0
+                stockScreenerStore.status.isBusy() &&
+                screenerResult.length === 0
             "
             v-for="i in 5"
             :key="i"
@@ -150,7 +146,13 @@ const loadMore = (entry: IntersectionObserverEntry) => {
             <v-skeleton-loader type="list-item-two-line"></v-skeleton-loader>
         </template>
 
-        <template v-else-if="screenerResult.length == 0">
+        <!-- Show no stock found while idle and result length is empty -->
+
+        <template
+            v-else-if="
+                stockScreenerStore.status.isIdle() && screenerResult.length == 0
+            "
+        >
             <v-img
                 :src="'/assets/svgs/search_not_found.svg'"
                 alt="search no found"
@@ -163,8 +165,11 @@ const loadMore = (entry: IntersectionObserverEntry) => {
                 >
             </v-row>
         </template>
+
+        <!-- Stock screener dialog -->
         <StockScreener />
-        <!-- Chart Settings -->
+
+        <!-- Chart settings button -->
         <template v-slot:append>
             <div class="ma-4">
                 <v-btn
@@ -178,6 +183,8 @@ const loadMore = (entry: IntersectionObserverEntry) => {
                 </v-btn>
             </div>
         </template>
+
+        <!-- Chart settings dialog -->
         <ChartSettings />
     </v-navigation-drawer>
 </template>

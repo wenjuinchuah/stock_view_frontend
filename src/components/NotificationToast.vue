@@ -1,42 +1,37 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useNotificationStore } from '@/stores/NotificationStore'
-import { Notification } from '@/classes/Notification'
 
 const store = useNotificationStore()
-const notification = computed<Notification | undefined>(
-    () => store.notification
-)
 </script>
 
 <template>
-    <template v-if="notification != undefined">
+    <template v-if="store.notification != undefined">
         <v-snackbar
             color="white"
             position="relative"
-            v-model="store.toggle"
+            v-model="store.isToggled"
             multi-line
             rounded="lg"
             location="top"
-            timeout="3000"
-            :key="notification.message"
+            timeout="4000"
+            :key="store.notification.message"
         >
             <v-row no-gutters class="mb-2">
                 <v-col cols="auto" align-self="center"
                     ><v-icon
                         :icon="
-                            notification.isError
+                            store.notification.isError
                                 ? 'error_outline'
                                 : 'notifications'
                         "
-                        :color="notification.isError ? 'red' : 'black'"
+                        :color="store.notification.isError ? 'red' : 'black'"
                         size="normal"
                         start
                     ></v-icon
                 ></v-col>
                 <v-col class="text-subtitle-1 font-weight-bold"
                     >{{
-                        notification.isError
+                        store.notification.isError
                             ? 'Oops! Something went wrong'
                             : 'Notification'
                     }}
@@ -46,16 +41,16 @@ const notification = computed<Notification | undefined>(
                         icon="close"
                         variant="plain"
                         density="compact"
-                        @click.down="store.toggle = false"
+                        @click.down="store.isToggled = false"
                     ></v-btn
                 ></v-col>
             </v-row>
             <v-row no-gutters>
                 <v-col cols="auto" class="mr-1"
-                    >[{{ notification.date }}]</v-col
+                    >[{{ store.notification.date }}]</v-col
                 >
                 <v-col cols="auto"
-                    >{{ notification.message.split('.')[0] }}.</v-col
+                    >{{ store.notification.message.split('.')[0] }}.</v-col
                 >
             </v-row>
         </v-snackbar>

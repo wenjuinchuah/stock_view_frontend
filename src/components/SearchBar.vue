@@ -18,12 +18,7 @@ watch(selectedStock, async () => {
         selectedStock.value !== storeSelectedStock.value &&
         selectedStock.value !== null
     ) {
-        stockChartStore.updateSelectedStock(selectedStock.value!)
-        try {
-            await stockChartStore.fetch()
-        } catch (error) {
-            searchBarStore.status.setError((error as Error).message)
-        }
+        await stockChartStore.fetch(selectedStock.value?.stockCode)
     }
 })
 </script>

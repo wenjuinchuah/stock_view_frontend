@@ -17,7 +17,7 @@ export const useAddRuleStore = defineStore('addRule', () => {
     }
 
     const actions = {
-        async fetch(): Promise<void> {
+        async init(): Promise<void> {
             try {
                 state.status.value.setBusy()
                 const response = await HttpService.get(

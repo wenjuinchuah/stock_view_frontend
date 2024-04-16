@@ -16,9 +16,8 @@ watch(storeSelectedRules, (newRules) => {
     selectedRules.value = newRules
 })
 
-onMounted(() => {
-    store.fetch()
-    selectedRules.value = storeSelectedRules.value
+onMounted(async () => {
+    await store.init()
 })
 </script>
 

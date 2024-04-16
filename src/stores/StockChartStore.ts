@@ -76,9 +76,6 @@ export const useStockChartStore = defineStore('stockChart', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
-        updateSelectedStock(stock: Stock): void {
-            state.selectedStock.value = stock
-        },
         updateChartIndicators(): void {
             if (state.stockChart.value) {
                 const selectedRules: string[] = addRuleStore.selectedRules

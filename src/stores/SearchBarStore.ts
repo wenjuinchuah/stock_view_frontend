@@ -20,7 +20,8 @@ export const useSearchBarStore = defineStore('searchBar', () => {
             }
 
             debounceTimeout = setTimeout(async () => {
-                if (!value) return false
+                if (!value || value.includes('[') || value.includes(']'))
+                    return false
                 state.status.value.setBusy()
                 try {
                     const response = await HttpService.get(

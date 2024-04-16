@@ -3,9 +3,12 @@ export class Notification {
     message: string
     isError: boolean = false
 
-    constructor(date: string, message: string, isError: boolean) {
-        this.date = date
+    constructor(message: string, isError?: boolean) {
+        this.date = new Date().toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+        })
         this.message = message
-        this.isError = isError
+        this.isError = isError ?? false
     }
 }

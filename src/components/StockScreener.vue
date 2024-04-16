@@ -19,9 +19,9 @@ const endDate = () => new Date(stockScreenerStore.stockScreener.endDate * 1000)
 const addRuleStore = useAddRuleStore()
 const selectedRules = computed(() => addRuleStore.selectedRules)
 
-onMounted(() => {
-    addRuleStore.fetch()
-    stockScreenerStore.getIndicatorSelector()
+onMounted(async () => {
+    await addRuleStore.init()
+    await stockScreenerStore.getIndicatorSelector()
 })
 
 watch(selectedRules, () => {
@@ -163,7 +163,10 @@ watch(selectedRules, () => {
                         class="bg-blue-darken-3 ms-4"
                         width="200"
                         @click.stop="stockScreenerStore.submit()"
-                        :disabled="!stockScreenerStore.isValidate || stockScreenerStore.status.isBusy()"
+                        :disabled="
+                            !stockScreenerStore.isValidate ||
+                            stockScreenerStore.status.isBusy()
+                        "
                         type="submit"
                         >Start Screening</v-btn
                     >
