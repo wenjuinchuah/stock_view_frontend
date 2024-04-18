@@ -9,6 +9,7 @@ export const useChartSettingsStore = defineStore('chartSettings', () => {
         showVolume: ref<boolean>(false),
         adjustData: ref<boolean>(true),
         indicators: ref<string[]>([]),
+        timeInterval: ref<Record<string, string>[]>([{ '1d': '1 Day' }]),
     }
 
     const actions = {

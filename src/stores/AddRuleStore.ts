@@ -5,9 +5,11 @@ import { StockIndicator } from '@/classes/StockIndicator'
 import HttpService from '@/services/HttpService'
 import { HttpStatus } from '@/enums/HttpStatus'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
+import { useChartSettingsStore } from '@/stores/ChartSettingsStore'
 
 export const useAddRuleStore = defineStore('addRule', () => {
     const stockScreenerStore = useStockScreenerStore()
+    const chartSettingsStore = useChartSettingsStore()
 
     const state = {
         status: ref<StoreStatus>(new StoreStatus()),
@@ -39,6 +41,7 @@ export const useAddRuleStore = defineStore('addRule', () => {
         },
         updateRules(rules: string[]): void {
             state.selectedRules.value = rules
+            chartSettingsStore.updateIndicators(rules)
         },
         removeRules(rules: string[]): void {
             const newSelectedRules = state.selectedRules.value.filter(

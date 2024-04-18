@@ -36,7 +36,7 @@ export class PriceList {
             return {
                 pricelistId: item.pricelist_id,
                 open: item.open,
-                close: item.adj_close,
+                close: item.close,
                 adjClose: item.adj_close,
                 high: item.high,
                 low: item.low,
@@ -51,7 +51,7 @@ export class PriceList {
         return {
             pricelist_id: priceList.pricelistId,
             open: priceList.open,
-            close: priceList.adjClose,
+            close: priceList.close,
             adj_close: priceList.adjClose,
             high: priceList.high,
             low: priceList.low,

@@ -5,7 +5,7 @@ import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { useSearchBarStore } from '@/stores/SearchBarStore'
 import { useStockChartStore } from '@/stores/StockChartStore'
-import { useDashboardViewStore } from './DashboardViewStore'
+import { useDashboardViewStore } from '@/stores/DashboardViewStore'
 
 export const useNotificationStore = defineStore('notification', () => {
     const stores = [

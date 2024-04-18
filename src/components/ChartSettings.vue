@@ -14,13 +14,11 @@ const chartSettingsStore = useChartSettingsStore()
 const addRuleStore = useAddRuleStore()
 const stockChartStore = useStockChartStore()
 const stockScreenerStore = useStockScreenerStore()
-const stockIndicator = computed<Map<string, StockIndicator>>(
-    () => stockScreenerStore.stockScreener.stockIndicator
-)
+const stockIndicator = computed<string[]>(() => chartSettingsStore.indicators)
 
 const submit = () => {
     addRuleStore.updateRules(chartSettingsStore.indicators)
-    stockChartStore.updateChartIndicators()
+    stockChartStore.fetch()
     chartSettingsStore.toggle()
 }
 </script>
@@ -54,7 +52,6 @@ const submit = () => {
                         label="Adjust data for dividends"
                         hide-details="auto"
                         class="text-black"
-                        disabled
                         v-model="chartSettingsStore.adjustData"
                     ></v-checkbox>
                 </v-col>
@@ -69,6 +66,7 @@ const submit = () => {
                         density="compact"
                         variant="outlined"
                         hide-details="auto"
+                        :items="['1 Day']"
                     ></v-select>
                 </v-col>
             </v-row>
@@ -79,7 +77,7 @@ const submit = () => {
                     <v-card-title>Technical Indicators</v-card-title>
                 </v-col>
             </v-row>
-            <template v-if="stockIndicator.size === 0">
+            <template v-if="stockIndicator.length === 0">
                 <v-img
                     :src="'/assets/svgs/add_new_rules.svg'"
                     alt="add new rules"
@@ -93,7 +91,7 @@ const submit = () => {
                 </v-row>
             </template>
 
-            <template v-else v-for="[key] in stockIndicator" :key="key">
+            <template v-else v-for="key in stockIndicator" :key="key">
                 <div class="m-4">
                     <v-row no-gutters justify="space-between">
                         <v-col cols="auto"
