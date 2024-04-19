@@ -66,7 +66,8 @@ const submit = () => {
                         density="compact"
                         variant="outlined"
                         hide-details="auto"
-                        :items="['1 Day']"
+                        :items="chartSettingsStore.timeInterval"
+                        v-model="chartSettingsStore.selectedTimeInterval"
                     ></v-select>
                 </v-col>
             </v-row>

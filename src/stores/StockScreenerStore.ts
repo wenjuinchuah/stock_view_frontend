@@ -21,6 +21,8 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
         screenerResult: ref<StockDetails[]>([]),
         indicatorSelector: ref<Map<string, any>>(),
         isValidate: ref<boolean>(true),
+        sortPercentageByPositive: ref<boolean | undefined>(true),
+        sortPriceByPositive: ref<boolean | undefined>(),
     }
 
     const actions = {
@@ -44,6 +46,11 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                 state.stockScreener.value.result?.forEach((stockDetails) => {
                     state.screenerResult.value.push(stockDetails)
                 })
+                if (state.sortPercentageByPositive.value !== undefined) {
+                    actions.sortByPercentageChange(true)
+                } else if (state.sortPriceByPositive.value !== undefined) {
+                    actions.sortByPrice(true)
+                }
                 state.status.value.setIdle()
             } catch (error) {
                 state.status.value.setError((error as Error).message)
@@ -91,6 +98,32 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
             if (state.isValidate.value) {
                 actions.fetch(true)
             }
+        },
+        sortByPercentageChange(remain: boolean = false): void {
+            state.sortPriceByPositive.value = undefined
+            if (!remain) {
+                state.sortPercentageByPositive.value =
+                    !state.sortPercentageByPositive.value
+            }
+
+            state.screenerResult.value.sort((a, b) =>
+                state.sortPercentageByPositive.value
+                    ? b.percentageChange - a.percentageChange
+                    : a.percentageChange - b.percentageChange
+            )
+        },
+        sortByPrice(remain: boolean = false): void {
+            state.sortPercentageByPositive.value = undefined
+            if (!remain) {
+                state.sortPriceByPositive.value =
+                    !state.sortPriceByPositive.value
+            }
+
+            state.screenerResult.value.sort((a, b) =>
+                state.sortPriceByPositive.value
+                    ? b.closePrice - a.closePrice
+                    : a.closePrice - b.closePrice
+            )
         },
     }
 

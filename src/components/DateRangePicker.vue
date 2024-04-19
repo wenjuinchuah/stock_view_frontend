@@ -84,7 +84,7 @@ const updateEndDate = (date: Date) => {
             v-if="startDateToggled"
             class="start-date-picker"
             bg-color="white"
-            color="blue-darken-2"
+            color="blue-darken-3"
             mode-icon="expand_more"
             hide-header
             elevation="5"
@@ -106,7 +106,7 @@ const updateEndDate = (date: Date) => {
             v-if="endDateToggled"
             class="end-date-picker"
             bg-color="white"
-            color="blue-darken-2"
+            color="blue-darken-3"
             mode-icon="expand_more"
             hide-header
             elevation="5"

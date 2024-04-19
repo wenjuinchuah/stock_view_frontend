@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, computed } from 'vue'
+import { onMounted, onUnmounted, computed, watch } from 'vue'
 import { init, dispose, type Chart, utils } from 'klinecharts'
 import { useStockChartStore } from '@/stores/StockChartStore'
 import '@/services/FormatService'
@@ -22,7 +22,7 @@ const handleResize = () => {
     }
 }
 
-onMounted(async () => {
+const initialize = async () => {
     if (!stockChart.value) {
         const chart = init('chart', {
             customApi: {
@@ -49,7 +49,7 @@ onMounted(async () => {
                             { title: 'volume', value: '{volume}' },
                         ],
                         text: {
-                            marginTop: 54,
+                            marginTop: 58,
                             marginLeft: 16,
                         },
                     },
@@ -60,11 +60,22 @@ onMounted(async () => {
 
         window.addEventListener('resize', handleResize)
     }
+}
+
+onMounted(() => {
+    initialize()
 })
 
 onUnmounted(() => {
     dispose(stockChartStore.stockChart as Chart)
     window.removeEventListener('resize', handleResize)
+})
+
+watch(stockChart, () => {
+    if (!stockChart.value) {
+        console.log('WHY ITS UNMOUNTED')
+        initialize()
+    }
 })
 </script>
 
@@ -78,8 +89,20 @@ onUnmounted(() => {
                 [{{ selectedStock.stockCode }}]
                 {{ selectedStock.stockName }}
             </v-row>
-            <v-row no-gutters class="text-grey">
-                {{ selectedStock.stockFullName.capitalize() }}
+            <v-row no-gutters class="text-grey-darken-1">
+                <v-col cols="auto">
+                    {{ selectedStock.stockFullName.capitalize() }}</v-col
+                >
+                <v-col cols="auto" class="mx-3"
+                    ><v-chip
+                        size="x-small"
+                        variant="tonal"
+                        color="grey-darken-3"
+                        class="font-weight-bold"
+                        >Sector:
+                        {{ selectedStock.category?.capitalize() }}</v-chip
+                    ></v-col
+                >
             </v-row>
         </v-container>
     </template>

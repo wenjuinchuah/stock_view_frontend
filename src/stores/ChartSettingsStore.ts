@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { StoreStatus } from '@/classes/StoreStatus'
 import { ref } from 'vue'
+import { TimeInterval } from '@/enums/TimeInterval'
 
 export const useChartSettingsStore = defineStore('chartSettings', () => {
     const state = {
@@ -9,7 +10,15 @@ export const useChartSettingsStore = defineStore('chartSettings', () => {
         showVolume: ref<boolean>(false),
         adjustData: ref<boolean>(true),
         indicators: ref<string[]>([]),
-        timeInterval: ref<Record<string, string>[]>([{ '1d': '1 Day' }]),
+        timeInterval: ref<TimeInterval[]>([
+            TimeInterval.ONE_MONTH,
+            TimeInterval.THREE_MONTHS,
+            TimeInterval.SIX_MONTHS,
+            TimeInterval.ONE_YEAR,
+            TimeInterval.FIVE_YEARS,
+            TimeInterval.ALL,
+        ]),
+        selectedTimeInterval: ref<TimeInterval>(TimeInterval.ONE_YEAR),
     }
 
     const actions = {

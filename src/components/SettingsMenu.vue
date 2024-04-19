@@ -21,6 +21,28 @@ const loadMore = (entry: IntersectionObserverEntry) => {
         stockScreenerStore.fetch()
     }
 }
+
+const profitLossColor = (percentageChange: number) => {
+    if (percentageChange === 0) {
+        return ''
+    }
+    return percentageChange > 0 ? 'text-green' : 'text-red'
+}
+
+const sortingColor = (sortByPositive?: boolean) => {
+    if (sortByPositive === undefined) {
+        return 'grey-lighten-1'
+    }
+    return sortByPositive ? 'black' : 'grey-lighten-1'
+}
+
+const formatPercentage = (percentageChange: number) => {
+    let prefix = ''
+    if (percentageChange > 0) {
+        prefix = '+'
+    }
+    return `${prefix} ${percentageChange.toFixed(2)}%`
+}
 </script>
 
 <template>
@@ -55,7 +77,9 @@ const loadMore = (entry: IntersectionObserverEntry) => {
         <v-container class="py-0">
             <v-row no-gutters justify="space-between">
                 <v-col cols="auto" align-self="center">
-                    <p class="font-weight-medium m-0">Stock Screener ({{ screenerResult.length }})</p>
+                    <p class="font-weight-medium m-0">
+                        Stock Screener ({{ screenerResult.length }})
+                    </p>
                 </v-col>
                 <v-col cols="auto">
                     <v-btn
@@ -76,9 +100,82 @@ const loadMore = (entry: IntersectionObserverEntry) => {
                 justify="space-between"
                 class="px-4 text-center text-caption text-grey-darken-2"
             >
-                <v-col cols="6">Symbol</v-col>
-                <v-col cols="3">Open</v-col>
-                <v-col cols="3">Close</v-col>
+                <v-col cols="4"
+                    ><v-btn density="compact" block plain flat
+                        >Symbol</v-btn
+                    ></v-col
+                >
+                <v-col cols="4"
+                    ><v-btn
+                        density="compact"
+                        block
+                        plain
+                        flat
+                        @click.stop="stockScreenerStore.sortByPrice()"
+                        >Price<v-row no-gutters
+                            ><v-icon
+                                size="small"
+                                icon="arrow_drop_up"
+                                :color="
+                                    sortingColor(
+                                        stockScreenerStore.sortPriceByPositive ===
+                                            undefined
+                                            ? false
+                                            : !stockScreenerStore.sortPriceByPositive
+                                    )
+                                "
+                                style="position: absolute; top: 1.5px"
+                            ></v-icon
+                            ><v-icon
+                                size="small"
+                                icon="
+                            arrow_drop_down
+                            "
+                                :color="
+                                    sortingColor(
+                                        stockScreenerStore.sortPriceByPositive
+                                    )
+                                "
+                                style="position: absolute; bottom: 1.5px"
+                            ></v-icon></v-row></v-btn
+                ></v-col>
+                <v-col cols="4"
+                    ><v-btn
+                        density="compact"
+                        block
+                        plain
+                        flat
+                        @click.stop="
+                            stockScreenerStore.sortByPercentageChange()
+                        "
+                        >% Chg<v-row no-gutters
+                            ><v-icon
+                                size="small"
+                                icon="arrow_drop_up"
+                                :color="
+                                    sortingColor(
+                                        stockScreenerStore.sortPercentageByPositive ===
+                                            undefined
+                                            ? false
+                                            : !stockScreenerStore.sortPercentageByPositive
+                                    )
+                                "
+                                style="position: absolute; top: 1.5px"
+                            ></v-icon
+                            ><v-icon
+                                size="small"
+                                icon="
+                                arrow_drop_down
+                                "
+                                :color="
+                                    sortingColor(
+                                        stockScreenerStore.sortPercentageByPositive ??
+                                            undefined
+                                    )
+                                "
+                                style="position: absolute; bottom: 1.5px"
+                            ></v-icon></v-row></v-btn
+                ></v-col>
             </v-row>
 
             <!-- Render stock information -->
@@ -95,14 +192,20 @@ const loadMore = (entry: IntersectionObserverEntry) => {
                     "
                 >
                     <!-- List title -->
-                    <v-list-item-title>
+                    <v-list-item-title
+                        :class="profitLossColor(stockDetails.percentageChange)"
+                    >
                         <v-row no-gutters justify="space-between">
-                            <v-col cols="6">{{ stockDetails.stockName }}</v-col>
-                            <v-col cols="3" class="text-center">{{
-                                stockDetails.open.toFixed(3)
+                            <v-col cols="4" class="text-black">{{
+                                stockDetails.stockName
                             }}</v-col>
-                            <v-col cols="3" class="text-center">{{
-                                stockDetails.close.toFixed(3)
+                            <v-col cols="4" class="text-center">{{
+                                stockDetails.closePrice.toFixed(3)
+                            }}</v-col>
+                            <v-col cols="3" class="text-end">{{
+                                formatPercentage(
+                                    stockDetails.percentageChange
+                                )
                             }}</v-col>
                         </v-row>
                     </v-list-item-title>
@@ -127,7 +230,10 @@ const loadMore = (entry: IntersectionObserverEntry) => {
                 "
             >
                 <v-row no-gutters>
-                    <v-col class="text-center text-grey-darken-2" v-intersect="loadMore">
+                    <v-col
+                        class="text-center text-grey-darken-2"
+                        v-intersect="loadMore"
+                    >
                         Load more...
                     </v-col>
                 </v-row>

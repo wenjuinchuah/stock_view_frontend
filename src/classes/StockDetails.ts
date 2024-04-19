@@ -1,19 +1,19 @@
 export class StockDetails {
     stockCode: string
     stockName: string
-    open: number
-    close: number
+    closePrice: number
+    percentageChange: number
 
     constructor(
         stockCode: string,
         stockName: string,
-        open: number,
-        close: number
+        closePrice: number,
+        percentageChange: number
     ) {
         this.stockCode = stockCode
         this.stockName = stockName
-        this.open = open
-        this.close = close
+        this.closePrice = closePrice
+        this.percentageChange = percentageChange
     }
 
     static fromJson(json: any): StockDetails[] {
@@ -22,8 +22,8 @@ export class StockDetails {
                 return {
                     stockCode: item.stock_code,
                     stockName: item.stock_name,
-                    open: item.open,
-                    close: item.close,
+                    closePrice: item.close_price,
+                    percentageChange: item.percentage_change,
                 }
             })
         }

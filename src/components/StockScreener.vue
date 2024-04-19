@@ -107,7 +107,7 @@ watch(selectedRules, () => {
                     <div class="m-4">
                         <v-row no-gutters justify="space-between">
                             <v-col cols="auto"
-                                ><v-card-text class="text-blue-darken-2"
+                                ><v-card-text class="text-blue-darken-3"
                                     >AND</v-card-text
                                 ></v-col
                             >

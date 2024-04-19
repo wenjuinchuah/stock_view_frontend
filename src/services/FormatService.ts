@@ -3,7 +3,7 @@ interface String {
 }
 
 String.prototype.capitalize = function (): string {
-    const separators = [' ', '-']
+    const separators = [' ', '-', '(']
     let str = this.toString().toLowerCase()
     separators.forEach((separator) => {
         str = str
@@ -11,5 +11,5 @@ String.prototype.capitalize = function (): string {
             .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
             .join(separator)
     })
-    return str
+    return str.replace(/\((\w)/g, (match, p1) => `(${p1.toUpperCase()}`)
 }

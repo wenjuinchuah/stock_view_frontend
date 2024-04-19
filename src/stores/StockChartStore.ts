@@ -4,7 +4,7 @@ import { Stock } from '@/classes/Stock'
 import HttpService from '@/services/HttpService'
 import { StoreStatus } from '@/classes/StoreStatus'
 import { ref } from 'vue'
-import { type Chart, type KLineData } from 'klinecharts'
+import { type Chart } from 'klinecharts'
 import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useChartSettingsStore } from '@/stores/ChartSettingsStore'
 
@@ -17,8 +17,6 @@ export const useStockChartStore = defineStore('stockChart', () => {
         priceList: ref<PriceList[]>(),
         status: ref<StoreStatus>(new StoreStatus()),
         selectedStock: ref<Stock>(),
-        priceChange: ref<number>(0),
-        percentageChange: ref<number>(0),
         stockChart: ref<Chart>(),
         indicatorPaneDetails: ref<Map<string, string>>(new Map()),
     }
@@ -51,14 +49,14 @@ export const useStockChartStore = defineStore('stockChart', () => {
             state.status.value.setBusy()
             try {
                 const response = await HttpService.get(
-                    `/stock/get?stock_code=${stockCode}`
+                    `/stock/get?stock_code=${stockCode}&auto_adjust=${chartSettingsStore.adjustData}&time_period=${chartSettingsStore.selectedTimeInterval}`
                 )
                 const priceList = PriceList.fromJson(response.data)
-                priceList.sort((a, b) => a.timestamp - b.timestamp)
-                if (priceList) {
-                    methods.setPriceList(priceList)
+                if (priceList && state.stockChart.value) {
+                    state.stockChart.value.applyNewData(priceList)
+                    state.priceList.value = priceList
 
-                    if (state.priceList.value?.length === 0) {
+                    if (state.priceList.value.length === 0) {
                         state.status.value.setError(
                             'This stock is currently not available.'
                         )
@@ -68,10 +66,6 @@ export const useStockChartStore = defineStore('stockChart', () => {
                 state.selectedStock.value =
                     await actions.getStockByStockCode(stockCode)
 
-                // Methods
-                state.priceChange.value = methods.calculatePriceChange()
-                state.percentageChange.value =
-                    methods.calculatePercentageChange()
                 actions.updateChartIndicators()
                 state.stockChart.value?.resize()
 
@@ -115,52 +109,6 @@ export const useStockChartStore = defineStore('stockChart', () => {
 
                     state.indicatorPaneDetails.value.set(rule, paneId)
                 })
-            }
-        },
-    }
-
-    const methods = {
-        calculatePercentageChange(): number {
-            const priceList: PriceList[] | undefined = state.priceList.value
-            if (!priceList || priceList.length < 2) {
-                return 0
-            }
-
-            const latestPrice = priceList[priceList.length - 1].close
-            const previousPrice = priceList[priceList.length - 2].close
-
-            return ((latestPrice - previousPrice) / previousPrice) * 100
-        },
-        calculatePriceChange(): number {
-            const priceList: PriceList[] | undefined = state.priceList.value
-            if (!priceList || priceList.length < 2) {
-                return 0
-            }
-
-            const latestPrice = priceList[priceList.length - 1].close
-            const previousPrice = priceList[priceList.length - 2].close
-
-            return latestPrice - previousPrice
-        },
-        setPriceList(priceList: PriceList[]): void {
-            const isDataAdjusted = chartSettingsStore.adjustData ?? false
-            const dataList: KLineData[] = priceList.map((price) => ({
-                close: isDataAdjusted ? price.adjClose : price.close,
-                open: isDataAdjusted
-                    ? (price.open * price.adjClose) / price.close
-                    : price.open,
-                high: isDataAdjusted
-                    ? (price.high * price.adjClose) / price.close
-                    : price.high,
-                low: isDataAdjusted
-                    ? (price.low * price.adjClose) / price.close
-                    : price.low,
-                volume: price.volume / price.adjClose / price.close,
-                timestamp: price.timestamp,
-            }))
-
-            if (state.stockChart.value) {
-                state.stockChart.value.applyNewData(dataList)
             }
         },
     }
