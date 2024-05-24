@@ -1,30 +1,45 @@
+import { Indicator } from '@/enums/Indicator'
+
 export abstract class StockIndicator {
     static fromJson(json: any): Map<string, StockIndicator> {
         const indicators = new Map<string, StockIndicator>()
         if (json.cci) {
-            indicators.set('CCI', CCI.fromJson(json.cci))
+            indicators.set(Indicator.CCI, CCI.fromJson(json.cci))
         }
         if (json.macd) {
-            indicators.set('MACD', MACD.fromJson(json.macd))
+            indicators.set(Indicator.MACD, MACD.fromJson(json.macd))
         }
         if (json.kdj) {
-            indicators.set('KDJ', KDJ.fromJson(json.kdj))
+            indicators.set(Indicator.KDJ, KDJ.fromJson(json.kdj))
         }
         return indicators
     }
 
     static toJson(stockIndicators: Map<string, StockIndicator>): any {
         const json: any = {}
-        if (stockIndicators.get('CCI')) {
-            json.cci = CCI.toJson(stockIndicators.get('CCI') as CCI)
+        if (stockIndicators.get(Indicator.CCI)) {
+            json.cci = CCI.toJson(stockIndicators.get(Indicator.CCI) as CCI)
         }
-        if (stockIndicators.get('MACD')) {
-            json.macd = MACD.toJson(stockIndicators.get('MACD') as MACD)
+        if (stockIndicators.get(Indicator.MACD)) {
+            json.macd = MACD.toJson(stockIndicators.get(Indicator.MACD) as MACD)
         }
-        if (stockIndicators.get('KDJ')) {
-            json.kdj = KDJ.toJson(stockIndicators.get('KDJ') as KDJ)
+        if (stockIndicators.get(Indicator.KDJ)) {
+            json.kdj = KDJ.toJson(stockIndicators.get(Indicator.KDJ) as KDJ)
         }
         return json
+    }
+
+    static getParams(indicator: StockIndicator, rule: string): any[] {
+        switch (rule) {
+            case Indicator.CCI:
+                return CCI.getParams(indicator as CCI)
+            case Indicator.MACD:
+                return MACD.getParams(indicator as MACD)
+            case Indicator.KDJ:
+                return KDJ.getParams(indicator as KDJ)
+            default:
+                return []
+        }
     }
 }
 
@@ -50,6 +65,10 @@ export class CCI extends StockIndicator {
             overbought: cci.overbought,
             oversold: cci.oversold,
         }
+    }
+
+    static getParams(cci: CCI): any[] {
+        return [cci.timePeriod]
     }
 }
 
@@ -94,6 +113,10 @@ export class MACD extends StockIndicator {
             bullish: macd.bullish,
         }
     }
+
+    static getParams(macd: MACD): any[] {
+        return [macd.fastPeriod, macd.slowPeriod, macd.signalPeriod]
+    }
 }
 
 export class KDJ extends StockIndicator {
@@ -136,5 +159,9 @@ export class KDJ extends StockIndicator {
             golden_cross: kdj.goldenCross,
             dead_cross: kdj.deadCross,
         }
+    }
+
+    static getParams(kdj: KDJ): any[] {
+        return [kdj.loopbackPeriod, kdj.signalPeriod, kdj.smoothPeriod]
     }
 }

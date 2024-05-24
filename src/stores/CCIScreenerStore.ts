@@ -5,10 +5,13 @@ import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { CCI } from '@/classes/StockIndicator'
 import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 import type { StockScreener } from '@/classes/StockScreener'
+import { Indicator } from '@/enums/Indicator'
 
 export const useCCIScreenerStore = defineStore('cciScreener', () => {
     const addRuleStore = useAddRuleStore()
-    const availableRules: CCI = addRuleStore.availableRules?.get('CCI') as CCI
+    const availableRules: CCI = addRuleStore.availableRules?.get(
+        Indicator.CCI
+    ) as CCI
 
     const stockScreenerStore = useStockScreenerStore()
     const stockScreener = computed<StockScreener>(
@@ -16,9 +19,9 @@ export const useCCIScreenerStore = defineStore('cciScreener', () => {
     )
 
     watch(stockScreener, () => {
-        if (stockScreener.value.stockIndicator.has('CCI')) {
+        if (stockScreener.value.stockIndicator.has(Indicator.CCI)) {
             state.defaultValue.value = stockScreener.value.stockIndicator.get(
-                'CCI'
+                Indicator.CCI
             ) as CCI
         }
     })
@@ -37,7 +40,7 @@ export const useCCIScreenerStore = defineStore('cciScreener', () => {
 
     const actions = {
         screenerSelection(): ScreenerSelection[] {
-            const cci = stockScreenerStore.getScreenerSelection('CCI')
+            const cci = stockScreenerStore.getScreenerSelection(Indicator.CCI)
             if (!cci) return []
             return Object.entries(cci).map(([key, value]) => {
                 return {
@@ -56,7 +59,7 @@ export const useCCIScreenerStore = defineStore('cciScreener', () => {
             const oversold: number | null =
                 selectionType === 'oversold' ? value : null
 
-            stockScreenerStore.updateIndicator('CCI', {
+            stockScreenerStore.updateIndicator(Indicator.CCI, {
                 timePeriod,
                 overbought,
                 oversold,

@@ -41,7 +41,7 @@ const formatPercentage = (percentageChange: number) => {
     if (percentageChange > 0) {
         prefix = '+'
     }
-    return `${prefix} ${percentageChange.toFixed(2)}%`
+    return `${prefix}${percentageChange.toFixed(2)}%`
 }
 </script>
 
@@ -196,13 +196,13 @@ const formatPercentage = (percentageChange: number) => {
                         :class="profitLossColor(stockDetails.percentageChange)"
                     >
                         <v-row no-gutters justify="space-between">
-                            <v-col cols="4" class="text-black">{{
+                            <v-col cols="5" class="text-black">{{
                                 stockDetails.stockName
                             }}</v-col>
-                            <v-col cols="4" class="text-center">{{
+                            <v-col cols="3" class="text-center">{{
                                 stockDetails.closePrice.toFixed(3)
                             }}</v-col>
-                            <v-col cols="3" class="text-end">{{
+                            <v-col cols="4" class="text-end">{{
                                 formatPercentage(
                                     stockDetails.percentageChange
                                 )

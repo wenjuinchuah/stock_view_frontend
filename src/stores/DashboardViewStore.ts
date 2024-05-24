@@ -3,8 +3,11 @@ import { StoreStatus } from '@/classes/StoreStatus'
 import { ref } from 'vue'
 import HttpService from '@/services/HttpService'
 import { HttpStatus } from '@/enums/HttpStatus'
+import { useStockChartStore } from '@/stores/StockChartStore'
 
 export const useDashboardViewStore = defineStore('dashboardView', () => {
+    const stockChartStore = useStockChartStore()
+
     const state = {
         status: ref<StoreStatus>(new StoreStatus()),
         isAfterTradingHour: ref<boolean>(false),
@@ -20,6 +23,8 @@ export const useDashboardViewStore = defineStore('dashboardView', () => {
                 if (response.data.status === HttpStatus.ERROR) {
                     throw response.data
                 } else {
+                    state.responseMessage.value = response.data.data.message
+
                     const response2 = await HttpService.get(
                         '/price_list/is_after_trading_hour/get'
                     )
@@ -35,6 +40,7 @@ export const useDashboardViewStore = defineStore('dashboardView', () => {
                     if (response3.data.status === HttpStatus.ERROR) {
                         throw response3.data
                     }
+                    stockChartStore.fetch()
                     state.responseMessage.value = response3.data.data.message
                 }
 

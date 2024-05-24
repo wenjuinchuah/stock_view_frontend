@@ -5,10 +5,13 @@ import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { KDJ } from '@/classes/StockIndicator'
 import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 import { StockScreener } from '@/classes/StockScreener'
+import { Indicator } from '@/enums/Indicator'
 
 export const useKDJScreenerStore = defineStore('kdjScreener', () => {
     const addRuleStore = useAddRuleStore()
-    const availableRules: KDJ = addRuleStore.availableRules?.get('KDJ') as KDJ
+    const availableRules: KDJ = addRuleStore.availableRules?.get(
+        Indicator.KDJ
+    ) as KDJ
 
     const stockScreenerStore = useStockScreenerStore()
     const stockScreener = computed<StockScreener>(
@@ -16,9 +19,9 @@ export const useKDJScreenerStore = defineStore('kdjScreener', () => {
     )
 
     watch(stockScreener, () => {
-        if (stockScreener.value.stockIndicator.has('KDJ')) {
+        if (stockScreener.value.stockIndicator.has(Indicator.KDJ)) {
             state.defaultValue.value = stockScreener.value.stockIndicator.get(
-                'KDJ'
+                Indicator.KDJ
             ) as KDJ
         }
     })
@@ -39,7 +42,7 @@ export const useKDJScreenerStore = defineStore('kdjScreener', () => {
 
     const actions = {
         screenerSelection(): ScreenerSelection[] {
-            const kdj = stockScreenerStore.getScreenerSelection('KDJ')
+            const kdj = stockScreenerStore.getScreenerSelection(Indicator.KDJ)
             if (!kdj) return []
             return Object.entries(kdj).map(([key, value]) => {
                 return {
@@ -56,7 +59,7 @@ export const useKDJScreenerStore = defineStore('kdjScreener', () => {
         ): void {
             const goldenCross = selectionType === 'golden_cross'
             const deadCross = selectionType === 'dead_cross'
-            stockScreenerStore.updateIndicator('KDJ', {
+            stockScreenerStore.updateIndicator(Indicator.KDJ, {
                 loopbackPeriod,
                 signalPeriod,
                 smoothPeriod,

@@ -4,6 +4,8 @@ import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 import { KDJ } from '@/classes/StockIndicator'
 import { ref, computed, watch } from 'vue'
 
+const props = defineProps({ isSettings: Boolean })
+
 const store = useKDJScreenerStore()
 const defaultValue = computed<KDJ>(() => store.defaultValue)
 
@@ -39,19 +41,35 @@ watch(
 
 <template>
     <v-row no-gutters class="text-center mb-3">
-        <v-col cols="auto" align-self="center" class="ml-4">KDJ</v-col>
-        <v-col cols="auto" class="ml-4">
-            <v-select
-                variant="outlined"
-                density="compact"
-                hide-details="auto"
-                menu-icon="expand_more"
-                :items="store.screenerSelection()"
-                v-model="selection"
-                return-object
-            >
-            </v-select>
-        </v-col>
+        <v-col cols="auto" align-self="center" class="ml-4"
+            ><span class="text-decoration-underline">
+                KDJ<v-icon
+                    icon="info"
+                    size="x-small"
+                    class="ml-1 mb-1"
+                    color="grey-darken-2"
+                ></v-icon
+                ><v-tooltip location="top" activator="parent">
+                    The KDJ indicator is a technical analysis tool that combines
+                    elements of the stochastic oscillator and moving averages to
+                    identify potential buy and sell signals.
+                </v-tooltip>
+            </span></v-col
+        >
+        <template v-if="props.isSettings === false">
+            <v-col cols="auto" class="ml-4">
+                <v-select
+                    variant="outlined"
+                    density="compact"
+                    hide-details="auto"
+                    menu-icon="expand_more"
+                    :items="store.screenerSelection()"
+                    v-model="selection"
+                    return-object
+                >
+                </v-select>
+            </v-col>
+        </template>
     </v-row>
     <!-- Fast Period -->
     <v-row no-gutters class="text-cente mb-3" justify="space-between">

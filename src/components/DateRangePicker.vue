@@ -14,6 +14,7 @@ const endDate = ref<Date>(initialEndDate ?? null)
 
 const toggleStartDate = (): void => {
     startDateToggled.value = !startDateToggled.value
+    console.log('toggleStartDate: ' + startDateToggled.value)
     if (endDateToggled.value === true) {
         endDateToggled.value = false
     }
@@ -21,9 +22,14 @@ const toggleStartDate = (): void => {
 
 const toggleEndDate = (): void => {
     endDateToggled.value = !endDateToggled.value
+    console.log('toggleEndDate: ' + endDateToggled.value)
     if (startDateToggled.value === true) {
         startDateToggled.value = false
     }
+}
+
+const clickOutside = (type: string): void => {
+    
 }
 
 function allowedStartDate(date: any): boolean {
@@ -91,7 +97,7 @@ const updateEndDate = (date: Date) => {
             :allowed-dates="allowedStartDate"
             v-model="startDate"
             @update:modelValue="updateStartDate"
-            v-click-outside="toggleStartDate"
+            v-click-outside="clickOutside('start')"
         />
 
         <v-icon icon="arrow_right_alt" class="mx-2"></v-icon>
@@ -113,7 +119,7 @@ const updateEndDate = (date: Date) => {
             :allowed-dates="allowedEndDate"
             v-model="endDate"
             @update:modelValue="updateEndDate"
-            v-click-outside="toggleEndDate"
+            v-click-outside="clickOutside('end')"
         />
     </div>
 </template>

@@ -2,19 +2,21 @@
 import { useChartSettingsStore } from '@/stores/ChartSettingsStore'
 import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useStockChartStore } from '@/stores/StockChartStore'
-import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import CCIScreener from '@/components/CCIScreener.vue'
 import MACDScreener from '@/components/MACDScreener.vue'
 import KDJScreener from '@/components/KDJScreener.vue'
 import AddRule from '@/components/AddRule.vue'
 import { computed } from 'vue'
-import type { StockIndicator } from '@/classes/StockIndicator'
+import { Indicator } from '@/enums/Indicator'
 
 const chartSettingsStore = useChartSettingsStore()
 const addRuleStore = useAddRuleStore()
 const stockChartStore = useStockChartStore()
-const stockScreenerStore = useStockScreenerStore()
-const stockIndicator = computed<string[]>(() => chartSettingsStore.indicators)
+const stockIndicator = computed<string[]>(() =>
+    chartSettingsStore.indicators.filter(
+        (indicator) => indicator !== Indicator.VOLUME
+    )
+)
 
 const submit = () => {
     addRuleStore.updateRules(chartSettingsStore.indicators)
@@ -96,9 +98,9 @@ const submit = () => {
                 <div class="m-4">
                     <v-row no-gutters justify="space-between">
                         <v-col cols="auto"
-                            ><v-card-text class="text-blue-darken-2">{{
-                                key
-                            }}</v-card-text></v-col
+                            ><v-card-text class="text-blue-darken-2"
+                                >AND</v-card-text
+                            ></v-col
                         >
                         <v-col cols="auto" align-self="center"
                             ><v-btn
@@ -117,14 +119,15 @@ const submit = () => {
                             ></v-col
                         >
                     </v-row>
-                    <template v-if="key === 'CCI'">
-                        <CCIScreener />
+
+                    <template v-if="key === Indicator.CCI">
+                        <CCIScreener :isSettings="true" />
                     </template>
-                    <template v-else-if="key === 'MACD'">
-                        <MACDScreener />
+                    <template v-else-if="key === Indicator.MACD">
+                        <MACDScreener :isSettings="true" />
                     </template>
-                    <template v-else-if="key === 'KDJ'">
-                        <KDJScreener />
+                    <template v-else-if="key === Indicator.KDJ">
+                        <KDJScreener :isSettings="true" />
                     </template>
                 </div>
             </template>

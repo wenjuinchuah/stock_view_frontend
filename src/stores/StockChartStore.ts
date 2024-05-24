@@ -7,11 +7,15 @@ import { ref } from 'vue'
 import { type Chart } from 'klinecharts'
 import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useChartSettingsStore } from '@/stores/ChartSettingsStore'
+import { useStockScreenerStore } from '@/stores/StockScreenerStore'
+import { Indicator } from '@/enums/Indicator'
+import { CCI, KDJ, MACD, StockIndicator } from '@/classes/StockIndicator'
 
 export const useStockChartStore = defineStore('stockChart', () => {
     const defaultStockCode: string = '0001'
     const addRuleStore = useAddRuleStore()
     const chartSettingsStore = useChartSettingsStore()
+    const stockScreenerStore = useStockScreenerStore()
 
     const state = {
         priceList: ref<PriceList[]>(),
@@ -31,6 +35,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
             if (state.stockChart.value) {
                 // Stock chart settings
                 state.stockChart.value!.setPriceVolumePrecision(3, 0)
+                state.stockChart.value.setBarSpace(12)
             }
         },
         async getStockByStockCode(
@@ -71,18 +76,22 @@ export const useStockChartStore = defineStore('stockChart', () => {
 
                 state.status.value.setIdle()
             } catch (error) {
+                console.log((error as Error).message)
                 state.status.value.setError((error as Error).message)
             }
         },
         updateChartIndicators(): void {
             if (state.stockChart.value) {
-                let selectedRules: string[] = addRuleStore.selectedRules
+                const selectedRules: string[] = addRuleStore.selectedRules
                 if (chartSettingsStore.showVolume) {
-                    selectedRules.push('VOL')
+                    if (!selectedRules.includes(Indicator.VOLUME)) {
+                        selectedRules.push(Indicator.VOLUME)
+                    }
                 } else {
-                    selectedRules = selectedRules.filter(
-                        (rule) => rule !== 'VOL'
-                    )
+                    const index = selectedRules.indexOf(Indicator.VOLUME)
+                    if (index > -1) {
+                        selectedRules.splice(index, 1)
+                    }
                 }
 
                 // Remove indicators that are not selected
@@ -96,10 +105,35 @@ export const useStockChartStore = defineStore('stockChart', () => {
                     }
                 })
 
+                selectedRules.sort((a, b) => {
+                    if (a === Indicator.VOLUME) {
+                        return -1
+                    } else if (b === Indicator.VOLUME) {
+                        return 1
+                    }
+                    return 0
+                })
+
                 // Add indicators that are selected
                 selectedRules.forEach((rule) => {
+                    const indicator: StockIndicator =
+                        stockScreenerStore.stockScreener.stockIndicator.get(
+                            rule
+                        ) as StockIndicator
+
                     const paneId: string =
                         state.stockChart.value!.createIndicator(rule) ?? ''
+                    state.stockChart.value!.overrideIndicator(
+                        {
+                            name: rule,
+                            calcParams: StockIndicator.getParams(
+                                indicator,
+                                rule
+                            ),
+                        },
+                        paneId,
+                        () => {}
+                    )
 
                     if (state.indicatorPaneDetails.value.has(rule)) {
                         const oldPaneId: string =

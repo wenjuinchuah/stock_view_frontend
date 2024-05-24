@@ -10,6 +10,7 @@ import CCIScreener from '@/components/CCIScreener.vue'
 import MACDScreener from '@/components/MACDScreener.vue'
 import KDJScreener from '@/components/KDJScreener.vue'
 import { onMounted, computed, watch } from 'vue'
+import { Indicator } from '@/enums/Indicator'
 
 const stockScreenerStore = useStockScreenerStore()
 const startDate = () =>
@@ -17,7 +18,9 @@ const startDate = () =>
 const endDate = () => new Date(stockScreenerStore.stockScreener.endDate * 1000)
 
 const addRuleStore = useAddRuleStore()
-const selectedRules = computed(() => addRuleStore.selectedRules)
+const selectedRules = computed(() =>
+    addRuleStore.selectedRules.filter((value) => value !== Indicator.VOLUME)
+)
 
 onMounted(async () => {
     await addRuleStore.init()
@@ -27,13 +30,13 @@ onMounted(async () => {
 watch(selectedRules, () => {
     const screenerStores: any[] = []
     selectedRules.value.forEach((value) => {
-        if (value === 'CCI') {
+        if (value === Indicator.CCI) {
             screenerStores.push(useCCIScreenerStore())
         }
-        if (value === 'MACD') {
+        if (value === Indicator.MACD) {
             screenerStores.push(useMACDScreenerStore())
         }
-        if (value === 'KDJ') {
+        if (value === Indicator.KDJ) {
             screenerStores.push(useKDJScreenerStore())
         }
     })
@@ -102,7 +105,6 @@ watch(selectedRules, () => {
                         >
                     </v-row>
                 </template>
-
                 <template v-else v-for="value in selectedRules" :key="value">
                     <div class="m-4">
                         <v-row no-gutters justify="space-between">
@@ -124,13 +126,13 @@ watch(selectedRules, () => {
                                 ></v-col
                             >
                         </v-row>
-                        <template v-if="value === 'CCI'">
+                        <template v-if="value === Indicator.CCI">
                             <CCIScreener />
                         </template>
-                        <template v-else-if="value === 'MACD'">
+                        <template v-else-if="value === Indicator.MACD">
                             <MACDScreener />
                         </template>
-                        <template v-else-if="value === 'KDJ'">
+                        <template v-else-if="value === Indicator.KDJ">
                             <KDJScreener />
                         </template>
                     </div>
