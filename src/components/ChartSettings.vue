@@ -6,7 +6,7 @@ import CCIScreener from '@/components/CCIScreener.vue'
 import MACDScreener from '@/components/MACDScreener.vue'
 import KDJScreener from '@/components/KDJScreener.vue'
 import AddRule from '@/components/AddRule.vue'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { Indicator } from '@/enums/Indicator'
 
 const chartSettingsStore = useChartSettingsStore()
@@ -23,6 +23,10 @@ const submit = () => {
     stockChartStore.fetch()
     chartSettingsStore.toggle()
 }
+
+watch(stockIndicator, () => {
+    addRuleStore.selectedRules = stockIndicator.value
+})
 </script>
 
 <template>

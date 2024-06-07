@@ -83,6 +83,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
         updateChartIndicators(): void {
             if (state.stockChart.value) {
                 const selectedRules: string[] = addRuleStore.selectedRules
+
                 if (chartSettingsStore.showVolume) {
                     if (!selectedRules.includes(Indicator.VOLUME)) {
                         selectedRules.push(Indicator.VOLUME)
@@ -116,30 +117,25 @@ export const useStockChartStore = defineStore('stockChart', () => {
 
                 // Add indicators that are selected
                 selectedRules.forEach((rule) => {
+                    if (state.indicatorPaneDetails.value.has(rule)) {
+                        const oldPaneId: string =
+                            state.indicatorPaneDetails.value.get(rule) ?? ''
+                        state.stockChart.value!.removeIndicator(oldPaneId, rule)
+                    }
+
                     const indicator: StockIndicator =
                         stockScreenerStore.stockScreener.stockIndicator.get(
                             rule
                         ) as StockIndicator
 
                     const paneId: string =
-                        state.stockChart.value!.createIndicator(rule) ?? ''
-                    state.stockChart.value!.overrideIndicator(
-                        {
+                        state.stockChart.value!.createIndicator({
                             name: rule,
                             calcParams: StockIndicator.getParams(
                                 indicator,
                                 rule
                             ),
-                        },
-                        paneId,
-                        () => {}
-                    )
-
-                    if (state.indicatorPaneDetails.value.has(rule)) {
-                        const oldPaneId: string =
-                            state.indicatorPaneDetails.value.get(rule) ?? ''
-                        state.stockChart.value!.removeIndicator(oldPaneId, rule)
-                    }
+                        }) ?? ''
 
                     state.indicatorPaneDetails.value.set(rule, paneId)
                 })

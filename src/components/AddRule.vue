@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Indicator } from '@/enums/Indicator'
 import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { ref, watch, computed, onMounted } from 'vue'
 
@@ -18,6 +19,9 @@ watch(storeSelectedRules, (newRules) => {
 
 onMounted(async () => {
     await store.init()
+    selectedRules.value = storeSelectedRules.value.filter(
+        (rule) => rule !== Indicator.VOLUME
+    )
 })
 </script>
 
