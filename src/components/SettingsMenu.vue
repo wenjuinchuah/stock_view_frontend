@@ -65,18 +65,34 @@ const formatPercentage = (percentageChange: number) => {
     >
         <!-- Close drawer button & Search bar -->
         <template v-slot:prepend>
-            <v-btn
-                icon="close"
-                variant="plain"
-                @click.stop="settingsMenuStore.toggle"
-            ></v-btn>
+            <v-row no-gutters justify="space-between" align="center">
+                <v-col cols="auto">
+                    <v-btn
+                        icon="close"
+                        variant="plain"
+                        @click.stop="settingsMenuStore.toggle"
+                    ></v-btn>
+                </v-col>
+                <template v-if="screenerResult.length > 0">
+                    <v-col cols="auto">
+                        <v-btn
+                            prepend-icon="ios_share"
+                            variant="text"
+                            class="text-blue-darken-3"
+                            @click.stop="stockScreenerStore.exportResults()"
+                            >Export</v-btn
+                        >
+                    </v-col>
+                </template>
+            </v-row>
+
             <SearchBar />
         </template>
 
         <!-- Stock screener -->
         <v-container class="py-0">
-            <v-row no-gutters justify="space-between">
-                <v-col cols="auto" align-self="center">
+            <v-row no-gutters justify="space-between" align="center">
+                <v-col cols="auto">
                     <p class="font-weight-medium m-0">
                         Stock Screener ({{ screenerResult.length }})
                     </p>
@@ -203,9 +219,7 @@ const formatPercentage = (percentageChange: number) => {
                                 stockDetails.closePrice.toFixed(3)
                             }}</v-col>
                             <v-col cols="4" class="text-end">{{
-                                formatPercentage(
-                                    stockDetails.percentageChange
-                                )
+                                formatPercentage(stockDetails.percentageChange)
                             }}</v-col>
                         </v-row>
                     </v-list-item-title>

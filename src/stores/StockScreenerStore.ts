@@ -33,6 +33,7 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
             }
             state.status.value.setBusy()
             try {
+                methods.updatePageSize()
                 const response = await HttpService.post(
                     '/stock_screener/screen',
                     StockScreener.toJson(state.stockScreener.value)
@@ -124,6 +125,38 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                     ? b.closePrice - a.closePrice
                     : a.closePrice - b.closePrice
             )
+        },
+        exportResults(): void {
+            const header = ['stock_code', 'stock_name']
+            const data = state.screenerResult.value.map((stock) => [
+                stock.stockCode,
+                stock.stockName,
+            ])
+            const csv = [header, ...data]
+                .map((line) => line.join(','))
+                .join('\n')
+            const blob = new Blob([csv], { type: 'text/csv' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            const date = new Date()
+            date.setHours(date.getHours() + 8)
+
+            a.href = url
+            a.download = `screener_${date.toISOString().replace(/[-:]/g, '').slice(0, 15)}.csv`
+            a.click()
+            window.URL.revokeObjectURL(url)
+        },
+    }
+
+    const methods = {
+        updatePageSize(): void {
+            if (state.screenerResult.value.length < 10) {
+                state.stockScreener.value.pageSize = 1
+            } else if (state.screenerResult.value.length < 20) {
+                state.stockScreener.value.pageSize = 10
+            } else {
+                state.stockScreener.value.pageSize! = 20
+            }
         },
     }
 
