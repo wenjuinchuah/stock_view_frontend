@@ -12,6 +12,9 @@ const dashboardViewStore = useDashboardViewStore()
 const isAfterTradingHour = computed<boolean>(
     () => dashboardViewStore.isAfterTradingHour
 )
+const isDataAvailable = computed<boolean>(
+    () => dashboardViewStore.isDataAvailable
+)
 
 const setNotification = (message: string) => {
     const notification = new Notification(message)
@@ -23,8 +26,8 @@ onMounted(async () => {
     await dashboardViewStore.init()
 })
 
-watch(isAfterTradingHour, () => {
-    if (isAfterTradingHour.value) {
+watch([isAfterTradingHour, isDataAvailable], () => {
+    if (isAfterTradingHour.value && isDataAvailable.value) {
         setNotification('Fetching data from the server, it may take a while.')
     } else if (dashboardViewStore.responseMessage !== '') {
         setNotification(dashboardViewStore.responseMessage)
