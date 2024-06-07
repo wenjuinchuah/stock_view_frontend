@@ -124,21 +124,21 @@ export class KDJ extends StockIndicator {
     signalPeriod: number
     smoothPeriod: number
     goldenCross: boolean
-    deadCross: boolean
+    deathCross: boolean
 
     constructor(
         loopbackPeriod: number,
         signalPeriod: number,
         smoothPeriod: number,
         goldenCross: boolean,
-        deadCross: boolean
+        deathCross: boolean
     ) {
         super()
         this.loopbackPeriod = loopbackPeriod
         this.signalPeriod = signalPeriod
         this.smoothPeriod = smoothPeriod
         this.goldenCross = goldenCross
-        this.deadCross = deadCross
+        this.deathCross = deathCross
     }
 
     static fromJson(json: any): any {
@@ -147,7 +147,7 @@ export class KDJ extends StockIndicator {
             json.signal_period,
             json.smooth_period,
             json.golden_cross,
-            json.dead_cross
+            json.death_cross
         )
     }
 
@@ -157,7 +157,7 @@ export class KDJ extends StockIndicator {
             signal_period: kdj.signalPeriod,
             smooth_period: kdj.smoothPeriod,
             golden_cross: kdj.goldenCross,
-            dead_cross: kdj.deadCross,
+            death_cross: kdj.deathCross,
         }
     }
 

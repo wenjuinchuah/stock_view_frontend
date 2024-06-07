@@ -36,6 +36,7 @@ export const useCCIScreenerStore = defineStore('cciScreener', () => {
                     timePeriod: 20,
                 } as CCI)
         ),
+        selectionIndex: ref<number>(0),
     }
 
     const actions = {
@@ -59,11 +60,16 @@ export const useCCIScreenerStore = defineStore('cciScreener', () => {
             const oversold: number | null =
                 selectionType === 'oversold' ? value : null
 
-            stockScreenerStore.updateIndicator(Indicator.CCI, {
+            state.defaultValue.value = {
                 timePeriod,
                 overbought,
                 oversold,
-            } as CCI)
+            } as CCI
+
+            stockScreenerStore.updateIndicator(
+                Indicator.CCI,
+                state.defaultValue.value
+            )
         },
     }
 

@@ -3,17 +3,31 @@ import { useKDJScreenerStore } from '@/stores/KDJScreenerStore'
 import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 import { KDJ } from '@/classes/StockIndicator'
 import { ref, computed, watch } from 'vue'
+import { IndicatorSelection } from '@/enums/Indicator'
 
 const props = defineProps({ isSettings: Boolean })
 
 const store = useKDJScreenerStore()
 const defaultValue = computed<KDJ>(() => store.defaultValue)
 
-const selection = ref<ScreenerSelection>(store.screenerSelection()[0])
+const selection = ref<ScreenerSelection>(
+    store.screenerSelection()[store.selectionIndex]
+)
 
 const loopbackPeriod = ref<number>(defaultValue.value.loopbackPeriod)
 const signalPeriod = ref<number>(defaultValue.value.signalPeriod)
 const smoothPeriod = ref<number>(defaultValue.value.smoothPeriod)
+
+watch(selection, (newSelection) => {
+    switch (newSelection.value) {
+        case IndicatorSelection.GOLDEN_CROSS:
+            store.selectionIndex = 0
+            break
+        case IndicatorSelection.DEATH_CROSS:
+            store.selectionIndex = 1
+            break
+    }
+})
 
 watch(
     [selection, loopbackPeriod, signalPeriod, smoothPeriod],
@@ -24,11 +38,12 @@ watch(
             signalPeriod.value &&
             smoothPeriod.value
         ) {
+            // Convert periods value to number due to v-model return string
             store.updateStockScreener(
                 selection.value.value,
-                loopbackPeriod.value,
-                signalPeriod.value,
-                smoothPeriod.value
+                Number(loopbackPeriod.value),
+                Number(signalPeriod.value),
+                Number(smoothPeriod.value)
             )
             store.isValidate = true
         } else {

@@ -3,17 +3,31 @@ import { useMACDScreenerStore } from '@/stores/MACDScreenerStore'
 import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 import { MACD } from '@/classes/StockIndicator'
 import { ref, computed, watch } from 'vue'
+import { IndicatorSelection } from '@/enums/Indicator'
 
 const props = defineProps({ isSettings: Boolean })
 
 const store = useMACDScreenerStore()
 const defaultValue = computed<MACD>(() => store.defaultValue)
 
-const selection = ref<ScreenerSelection>(store.screenerSelection()[0])
+const selection = ref<ScreenerSelection>(
+    store.screenerSelection()[store.selectionIndex]
+)
 
 const fastPeriod = ref<number>(defaultValue.value.fastPeriod)
 const slowPeriod = ref<number>(defaultValue.value.slowPeriod)
 const signalPeriod = ref<number>(defaultValue.value.signalPeriod)
+
+watch(selection, (newSelection) => {
+    switch (newSelection.value) {
+        case IndicatorSelection.BULLISH:
+            store.selectionIndex = 0
+            break
+        case IndicatorSelection.BEARISH:
+            store.selectionIndex = 1
+            break
+    }
+})
 
 watch(
     [selection, fastPeriod, slowPeriod, signalPeriod],
@@ -24,11 +38,12 @@ watch(
             slowPeriod.value &&
             signalPeriod.value
         ) {
+            // Convert periods value to number due to v-model return string
             store.updateStockScreener(
                 selection.value.value,
-                fastPeriod.value,
-                slowPeriod.value,
-                signalPeriod.value
+                Number(fastPeriod.value),
+                Number(slowPeriod.value),
+                Number(signalPeriod.value)
             )
             store.isValidate = true
         } else {
@@ -43,7 +58,12 @@ watch(
     <v-row no-gutters class="text-center mb-3">
         <v-col cols="auto" align-self="center" class="ml-4"
             ><span class="text-decoration-underline">
-                MACD<v-icon icon="info" size="x-small" class="ml-1 mb-1" color="grey-darken-2"></v-icon
+                MACD<v-icon
+                    icon="info"
+                    size="x-small"
+                    class="ml-1 mb-1"
+                    color="grey-darken-2"
+                ></v-icon
                 ><v-tooltip location="top" activator="parent">
                     The Moving Average Convergence Divergence (MACD) is a
                     popular technical analysis tool used to identify changes in

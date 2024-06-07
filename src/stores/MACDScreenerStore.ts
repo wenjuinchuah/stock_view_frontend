@@ -5,7 +5,7 @@ import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { MACD } from '@/classes/StockIndicator'
 import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 import { StockScreener } from '@/classes/StockScreener'
-import { Indicator } from '@/enums/Indicator'
+import { Indicator, IndicatorSelection } from '@/enums/Indicator'
 
 export const useMACDScreenerStore = defineStore('macdScreener', () => {
     const addRuleStore = useAddRuleStore()
@@ -38,6 +38,7 @@ export const useMACDScreenerStore = defineStore('macdScreener', () => {
                     bullish: false,
                 } as MACD)
         ),
+        selectionIndex: ref<number>(0),
     }
 
     const actions = {
@@ -57,15 +58,18 @@ export const useMACDScreenerStore = defineStore('macdScreener', () => {
             slowPeriod: number,
             signalPeriod: number
         ): void {
-            const bearish = selectionType === 'bearish'
-            const bullish = selectionType === 'bullish'
-            stockScreenerStore.updateIndicator(Indicator.MACD, {
-                fastPeriod,
-                slowPeriod,
-                signalPeriod,
-                bearish,
-                bullish,
-            } as MACD)
+            state.defaultValue.value = {
+                fastPeriod: fastPeriod,
+                slowPeriod: slowPeriod,
+                signalPeriod: signalPeriod,
+                bearish: selectionType === IndicatorSelection.BEARISH,
+                bullish: selectionType === IndicatorSelection.BULLISH,
+            } as MACD
+
+            stockScreenerStore.updateIndicator(
+                Indicator.MACD,
+                state.defaultValue.value
+            )
         },
     }
 

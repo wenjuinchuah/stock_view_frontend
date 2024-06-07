@@ -3,13 +3,16 @@ import { useCCIScreenerStore } from '@/stores/CCIScreenerStore'
 import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 import { CCI } from '@/classes/StockIndicator'
 import { ref, computed, watch } from 'vue'
+import { IndicatorSelection } from '@/enums/Indicator'
 
 const props = defineProps({ isSettings: Boolean })
 
 const store = useCCIScreenerStore()
 const defaultValue = computed<CCI>(() => store.defaultValue)
 
-const selection = ref<ScreenerSelection>(store.screenerSelection()[0])
+const selection = ref<ScreenerSelection>(
+    store.screenerSelection()[store.selectionIndex]
+)
 const value = ref<number>(
     selection.value.value === 'overbought'
         ? defaultValue.value.overbought
@@ -17,11 +20,16 @@ const value = ref<number>(
 )
 const periodValue = ref<number>(defaultValue.value.timePeriod)
 
-watch(selection, (newValue) => {
-    if (newValue.value === 'overbought') {
-        value.value = defaultValue.value.overbought
-    } else {
-        value.value = defaultValue.value.oversold
+watch(selection, (newSelection) => {
+    switch (newSelection.value) {
+        case IndicatorSelection.OVERBOUGHT:
+            value.value = defaultValue.value.overbought ?? 100
+            store.selectionIndex = 0
+            break
+        case IndicatorSelection.OVERSOLD:
+            value.value = defaultValue.value.oversold ?? -100
+            store.selectionIndex = 1
+            break
     }
 })
 
@@ -29,8 +37,9 @@ watch(
     [selection, value, periodValue],
     () => {
         if (selection.value && value.value && periodValue.value) {
+            // Convert periods value to number due to v-model return string
             store.updateStockScreener(
-                periodValue.value,
+                Number(periodValue.value),
                 selection.value.value,
                 value.value
             )

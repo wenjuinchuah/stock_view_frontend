@@ -5,7 +5,7 @@ import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { KDJ } from '@/classes/StockIndicator'
 import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 import { StockScreener } from '@/classes/StockScreener'
-import { Indicator } from '@/enums/Indicator'
+import { Indicator, IndicatorSelection } from '@/enums/Indicator'
 
 export const useKDJScreenerStore = defineStore('kdjScreener', () => {
     const addRuleStore = useAddRuleStore()
@@ -35,9 +35,10 @@ export const useKDJScreenerStore = defineStore('kdjScreener', () => {
                     signalPeriod: 3,
                     smoothPeriod: 3,
                     goldenCross: false,
-                    deadCross: false,
+                    deathCross: false,
                 } as KDJ)
         ),
+        selectionIndex: ref<number>(0),
     }
 
     const actions = {
@@ -57,15 +58,18 @@ export const useKDJScreenerStore = defineStore('kdjScreener', () => {
             signalPeriod: number,
             smoothPeriod: number
         ): void {
-            const goldenCross = selectionType === 'golden_cross'
-            const deadCross = selectionType === 'dead_cross'
-            stockScreenerStore.updateIndicator(Indicator.KDJ, {
+            state.defaultValue.value = {
                 loopbackPeriod,
                 signalPeriod,
                 smoothPeriod,
-                goldenCross,
-                deadCross,
-            } as KDJ)
+                goldenCross: selectionType === IndicatorSelection.GOLDEN_CROSS,
+                deathCross: selectionType === IndicatorSelection.DEATH_CROSS,
+            } as KDJ
+
+            stockScreenerStore.updateIndicator(
+                Indicator.KDJ,
+                state.defaultValue.value
+            )
         },
     }
 
