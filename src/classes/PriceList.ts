@@ -41,7 +41,7 @@ export class PriceList {
                 high: item.high,
                 low: item.low,
                 volume: item.volume,
-                timestamp: item.datetime * 1000,
+                timestamp: item.timestamp * 1000,
                 stockCode: item.stock_code,
             }
         })
@@ -56,7 +56,7 @@ export class PriceList {
             high: priceList.high,
             low: priceList.low,
             volume: priceList.volume,
-            datetime: priceList.timestamp / 1000,
+            timestamp: priceList.timestamp / 1000,
             stock_code: priceList.stockCode,
         }
     }
