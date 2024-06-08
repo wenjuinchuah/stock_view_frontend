@@ -99,41 +99,43 @@ watch(stockIndicator, () => {
             </template>
 
             <template v-else v-for="key in stockIndicator" :key="key">
-                <div class="m-4">
-                    <v-row no-gutters justify="space-between">
-                        <v-col cols="auto"
-                            ><v-card-text class="text-blue-darken-2"
-                                >AND</v-card-text
-                            ></v-col
-                        >
-                        <v-col cols="auto" align-self="center"
-                            ><v-btn
-                                class="text-decoration-underline"
-                                variant="text"
-                                density="compact"
-                                color="red"
-                                @click.stop="
-                                    () => {
-                                        chartSettingsStore.removeIndicators([
-                                            key,
-                                        ])
-                                    }
-                                "
-                                >Delete</v-btn
-                            ></v-col
-                        >
-                    </v-row>
+                <template v-if="key !== Indicator.VOLUME">
+                    <div class="m-4">
+                        <v-row no-gutters justify="space-between">
+                            <v-col cols="auto"
+                                ><v-card-text class="text-blue-darken-2"
+                                    >AND</v-card-text
+                                ></v-col
+                            >
+                            <v-col cols="auto" align-self="center"
+                                ><v-btn
+                                    class="text-decoration-underline"
+                                    variant="text"
+                                    density="compact"
+                                    color="red"
+                                    @click.stop="
+                                        () => {
+                                            chartSettingsStore.removeIndicators(
+                                                [key]
+                                            )
+                                        }
+                                    "
+                                    >Delete</v-btn
+                                ></v-col
+                            >
+                        </v-row>
 
-                    <template v-if="key === Indicator.CCI">
-                        <CCIScreener :isSettings="true" />
-                    </template>
-                    <template v-else-if="key === Indicator.MACD">
-                        <MACDScreener :isSettings="true" />
-                    </template>
-                    <template v-else-if="key === Indicator.KDJ">
-                        <KDJScreener :isSettings="true" />
-                    </template>
-                </div>
+                        <template v-if="key === Indicator.CCI">
+                            <CCIScreener :isSettings="true" />
+                        </template>
+                        <template v-else-if="key === Indicator.MACD">
+                            <MACDScreener :isSettings="true" />
+                        </template>
+                        <template v-else-if="key === Indicator.KDJ">
+                            <KDJScreener :isSettings="true" />
+                        </template>
+                    </div>
+                </template>
             </template>
             <!-- Add new rules button -->
             <v-row no-gutters class="mx-3 my-4">
