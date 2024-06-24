@@ -9,7 +9,7 @@ import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useChartSettingsStore } from '@/stores/ChartSettingsStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { Indicator } from '@/enums/Indicator'
-import { CCI, KDJ, MACD, StockIndicator } from '@/classes/StockIndicator'
+import { StockIndicator } from '@/classes/StockIndicator'
 
 export const useStockChartStore = defineStore('stockChart', () => {
     const defaultStockCode: string = '0001'
@@ -26,6 +26,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
     }
 
     const actions = {
+        // Initialize the store
         async init(chart: Chart): Promise<void> {
             state.status.value.setBusy()
 
@@ -38,6 +39,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
                 state.stockChart.value.setBarSpace(12)
             }
         },
+        // Get the stock by stock code
         async getStockByStockCode(
             stockCode: string
         ): Promise<Stock | undefined> {
@@ -46,6 +48,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
             )
             return Stock.fromJson(response.data) as Stock
         },
+        // Fetch the stock data
         async fetch(
             stockCode: string = state.selectedStock.value
                 ? state.selectedStock.value.stockCode
@@ -80,6 +83,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
+        // Update the stock data
         updateChartIndicators(): void {
             if (state.stockChart.value) {
                 const selectedRules: string[] = addRuleStore.selectedRules

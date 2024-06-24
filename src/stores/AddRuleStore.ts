@@ -19,6 +19,7 @@ export const useAddRuleStore = defineStore('addRule', () => {
     }
 
     const actions = {
+        // Initialize the store
         async init(): Promise<void> {
             try {
                 state.status.value.setBusy()
@@ -36,13 +37,16 @@ export const useAddRuleStore = defineStore('addRule', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
+        // Toggle the add rule modal
         toggle(): void {
             state.isToggled.value = !state.isToggled.value
         },
+        // Update rules to the stock screener
         updateRules(rules: string[]): void {
             state.selectedRules.value = rules
             chartSettingsStore.updateIndicators(rules)
         },
+        // Remove rules to the stock screener
         removeRules(rules: string[]): void {
             const newSelectedRules = state.selectedRules.value.filter(
                 (rule) => !rules.includes(rule)

@@ -26,6 +26,7 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
     }
 
     const actions = {
+        // Fetch the stock screener data
         async fetch(refresh: boolean = false): Promise<void> {
             if (refresh) {
                 state.stockScreener.value.lastStockCode = undefined
@@ -33,7 +34,10 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
             }
             state.status.value.setBusy()
             try {
+                // Update the page size based on the number of results
                 methods.updatePageSize()
+
+                // Fetch the stock screener data
                 const response = await HttpService.post(
                     '/stock_screener/screen',
                     StockScreener.toJson(state.stockScreener.value)
@@ -44,9 +48,13 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                 state.stockScreener.value = StockScreener.fromJson(
                     response.data
                 )
+
+                // Append the results to the screener result
                 state.stockScreener.value.result?.forEach((stockDetails) => {
                     state.screenerResult.value.push(stockDetails)
                 })
+
+                // Sort the results based on the selected sorting method
                 if (state.sortPercentageByPositive.value !== undefined) {
                     actions.sortByPercentageChange(true)
                 } else if (state.sortPriceByPositive.value !== undefined) {
@@ -57,23 +65,29 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
+        // Toggle the stock screener
         toggle(): void {
             state.isToggled.value = !state.isToggled.value
         },
+        // Update the start date
         startDateChange(date: Date): void {
             state.stockScreener.value.startDate = date.getTime() / 1000
         },
+        // Update the end date
         endDateChange(date: Date): void {
             state.stockScreener.value.endDate = date.getTime() / 1000
         },
+        // Update the stock indicator
         updateIndicator(indicator: string, value: any): void {
             state.stockScreener.value.stockIndicator.set(indicator, value)
         },
+        // Remove the stock indicator
         removeIndicators(indicators: string[]): void {
             indicators.forEach((indicator) => {
                 state.stockScreener.value.stockIndicator.delete(indicator)
             })
         },
+        // Get the indicator selector
         async getIndicatorSelector(): Promise<void> {
             try {
                 state.status.value.setBusy()
@@ -91,15 +105,18 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
+        // Get the screener selection
         getScreenerSelection(indicator: string): StockIndicator | undefined {
             return state.indicatorSelector.value?.get(indicator.toLowerCase())
         },
+        // Submit the stock screener
         submit(): void {
             actions.toggle()
             if (state.isValidate.value) {
                 actions.fetch(true)
             }
         },
+        // Sort the stock screener by percentage change
         sortByPercentageChange(remain: boolean = false): void {
             state.sortPriceByPositive.value = undefined
             if (!remain) {
@@ -113,6 +130,7 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                     : a.percentageChange - b.percentageChange
             )
         },
+        // Sort the stock screener by price
         sortByPrice(remain: boolean = false): void {
             state.sortPercentageByPositive.value = undefined
             if (!remain) {
@@ -126,6 +144,7 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
                     : a.closePrice - b.closePrice
             )
         },
+        // Export the stock screener results
         exportResults(): void {
             const header = ['stock_code', 'stock_name']
             const data = state.screenerResult.value.map((stock) => [
@@ -149,6 +168,7 @@ export const useStockScreenerStore = defineStore('stockScreener', () => {
     }
 
     const methods = {
+        // Update the page size based on the number of results
         updatePageSize(): void {
             if (state.screenerResult.value.length < 10) {
                 state.stockScreener.value.pageSize = 1

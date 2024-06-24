@@ -14,11 +14,14 @@ export const useSearchBarStore = defineStore('searchBar', () => {
     }
 
     const actions = {
+        // Get the stock details based on the input value
         async onInput(value: string): Promise<void> {
+            // Clear the debounce timeout
             if (debounceTimeout) {
                 clearTimeout(debounceTimeout)
             }
 
+            // Set the debounce timeout for 500ms to prevent multiple API calls
             debounceTimeout = setTimeout(async () => {
                 if (!value || value.includes('[') || value.includes(']'))
                     return false
@@ -39,6 +42,7 @@ export const useSearchBarStore = defineStore('searchBar', () => {
                 }
             }, 500)
         },
+        // Filter the stock based on the query
         filter(item: Stock, query: string): boolean {
             return (
                 item.stockName.toLowerCase().includes(query.toLowerCase()) ||

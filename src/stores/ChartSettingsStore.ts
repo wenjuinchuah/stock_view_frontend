@@ -22,12 +22,15 @@ export const useChartSettingsStore = defineStore('chartSettings', () => {
     }
 
     const actions = {
+        // Toggle the chart settings modal
         toggle(): void {
             state.isToggled.value = !state.isToggled.value
         },
+        // Update the selected inticator value
         updateIndicators(indicators: string[]): void {
             state.indicators.value = indicators
         },
+        // Remove the selected indicator value
         removeIndicators(indicators: string[]): void {
             const newSelectedIndicators = state.indicators.value.filter(
                 (indicator) => !indicators.includes(indicator)

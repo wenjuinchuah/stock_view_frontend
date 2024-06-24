@@ -18,6 +18,7 @@ export const useCCIScreenerStore = defineStore('cciScreener', () => {
         () => stockScreenerStore.stockScreener
     )
 
+    // Watch for changes in the stock screener
     watch(stockScreener, () => {
         if (stockScreener.value.stockIndicator.has(Indicator.CCI)) {
             state.defaultValue.value = stockScreener.value.stockIndicator.get(
@@ -40,6 +41,7 @@ export const useCCIScreenerStore = defineStore('cciScreener', () => {
     }
 
     const actions = {
+        // Get the available CCI screener selection
         screenerSelection(): ScreenerSelection[] {
             const cci = stockScreenerStore.getScreenerSelection(Indicator.CCI)
             if (!cci) return []
@@ -50,6 +52,7 @@ export const useCCIScreenerStore = defineStore('cciScreener', () => {
                 } as ScreenerSelection
             })
         },
+        // Update the CCI screener selection value
         updateStockScreener(
             timePeriod: number,
             selectionType: string,

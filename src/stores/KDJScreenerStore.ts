@@ -18,6 +18,7 @@ export const useKDJScreenerStore = defineStore('kdjScreener', () => {
         () => stockScreenerStore.stockScreener
     )
 
+    // Watch for changes in the stock screener
     watch(stockScreener, () => {
         if (stockScreener.value.stockIndicator.has(Indicator.KDJ)) {
             state.defaultValue.value = stockScreener.value.stockIndicator.get(
@@ -42,6 +43,7 @@ export const useKDJScreenerStore = defineStore('kdjScreener', () => {
     }
 
     const actions = {
+        // Get the available KDJ screener selection
         screenerSelection(): ScreenerSelection[] {
             const kdj = stockScreenerStore.getScreenerSelection(Indicator.KDJ)
             if (!kdj) return []
@@ -52,6 +54,7 @@ export const useKDJScreenerStore = defineStore('kdjScreener', () => {
                 } as ScreenerSelection
             })
         },
+        // Update the KDJ screener selection value
         updateStockScreener(
             selectionType: string,
             loopbackPeriod: number,

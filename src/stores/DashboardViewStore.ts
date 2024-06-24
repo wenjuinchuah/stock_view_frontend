@@ -16,32 +16,42 @@ export const useDashboardViewStore = defineStore('dashboardView', () => {
     }
 
     const actions = {
+        // Initialize the store
         async init(): Promise<void> {
             try {
                 state.status.value.setBusy()
 
-                const response = await HttpService.post('/stock/update')
-                if (response.data.status === HttpStatus.ERROR) {
-                    throw response.data
-                } else {
-                    state.responseMessage.value = response.data.data.message
+                // Check if data is available and if it is after trading hour
+                const [response1, response2] = await Promise.all([
+                    HttpService.get('/price_list/is_data_available'),
+                    HttpService.get('/price_list/is_after_trading_hour'),
+                ])
 
-                    const [response2, response3] = await Promise.all([
-                        HttpService.get('/price_list/is_data_available'),
-                        HttpService.get('/price_list/is_after_trading_hour'),
-                    ])
+                if (response1.data.status === HttpStatus.ERROR) {
+                    throw response1.data
+                }
+                if (response2.data.status === HttpStatus.ERROR) {
+                    throw response2.data
+                }
 
-                    if (response2.data.status === HttpStatus.ERROR) {
-                        throw response2.data
-                    }
+                state.isDataAvailable.value = response1.data.data
+                state.isAfterTradingHour.value = response2.data.data
+
+                // Update the stock data if data is not available or if it is after trading hour
+                if (
+                    !state.isDataAvailable.value ||
+                    state.isAfterTradingHour.value
+                ) {
+                    const response3 = await HttpService.post('/stock/update')
+
                     if (response3.data.status === HttpStatus.ERROR) {
                         throw response3.data
                     }
 
-                    state.isDataAvailable.value = response2.data.data
-                    state.isAfterTradingHour.value = response3.data.data
+                    state.responseMessage.value = response3.data.data.message
                 }
 
+                // Update the price list data if data is not available
                 if (!state.isDataAvailable.value) {
                     const response4 = await HttpService.get(
                         '/price_list/update/initialize'
@@ -52,6 +62,7 @@ export const useDashboardViewStore = defineStore('dashboardView', () => {
                     state.isDataAvailable.value = true
                 }
 
+                // Update the price list data if data is available and it is after trading hour
                 if (
                     state.isDataAvailable.value &&
                     state.isAfterTradingHour.value

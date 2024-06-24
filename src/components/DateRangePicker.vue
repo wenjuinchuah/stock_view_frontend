@@ -28,10 +28,6 @@ const toggleEndDate = (): void => {
     }
 }
 
-const clickOutside = (type: string): void => {
-    
-}
-
 function allowedStartDate(date: any): boolean {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -97,7 +93,6 @@ const updateEndDate = (date: Date) => {
             :allowed-dates="allowedStartDate"
             v-model="startDate"
             @update:modelValue="updateStartDate"
-            v-click-outside="clickOutside('start')"
         />
 
         <v-icon icon="arrow_right_alt" class="mx-2"></v-icon>
@@ -119,7 +114,6 @@ const updateEndDate = (date: Date) => {
             :allowed-dates="allowedEndDate"
             v-model="endDate"
             @update:modelValue="updateEndDate"
-            v-click-outside="clickOutside('end')"
         />
     </div>
 </template>

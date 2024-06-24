@@ -42,6 +42,7 @@ export const useMACDScreenerStore = defineStore('macdScreener', () => {
     }
 
     const actions = {
+        // Get the available MACD screener selection
         screenerSelection(): ScreenerSelection[] {
             const macd = stockScreenerStore.getScreenerSelection(Indicator.MACD)
             if (!macd) return []
@@ -52,6 +53,7 @@ export const useMACDScreenerStore = defineStore('macdScreener', () => {
                 } as ScreenerSelection
             })
         },
+        // Update the MACD screener selection value
         updateStockScreener(
             selectionType: string,
             fastPeriod: number,

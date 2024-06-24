@@ -16,6 +16,7 @@ export const useNotificationStore = defineStore('notification', () => {
         useDashboardViewStore(),
     ]
 
+    // Watch for errors in the stores
     for (const store of stores) {
         watch(store.status, (newStatus) => {
             if (newStatus.isError()) {
@@ -32,6 +33,7 @@ export const useNotificationStore = defineStore('notification', () => {
     }
 
     const actions = {
+        // Toggle the notification
         toggle(): void {
             state.isToggled.value = !state.isToggled.value
         },

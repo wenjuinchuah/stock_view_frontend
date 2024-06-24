@@ -12,6 +12,7 @@ export const useSettingsMenuStore = defineStore('settingsMenu', () => {
     }
 
     const actions = {
+        // Display stock chart data based on the stock code provided
         async selectStock(stockCode: string): Promise<void> {
             state.status.value.setBusy()
             try {
@@ -21,6 +22,7 @@ export const useSettingsMenuStore = defineStore('settingsMenu', () => {
                 state.status.value.setError((error as Error).message)
             }
         },
+        // Toggle the settings menu
         toggle(): void {
             state.isToggled.value = !state.isToggled.value
             setTimeout(() => {
