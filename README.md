@@ -1,5 +1,4 @@
 # Stock View Frontend
-# Stock View Frontend
 
 This is the frontend application for the Stock View system.
 
@@ -36,7 +35,6 @@ This is the frontend application for the Stock View system.
    ```bash
    npm install
 
-## Running the Application
 ## Running the Application
 
 1. Start the development server:
@@ -46,11 +44,7 @@ This is the frontend application for the Stock View system.
 2. Open your browser and navigate to `http://localhost:5173`.
 
 ## Building for Production
-## Building for Production
 
-To create a production build of the application:
-   ```bash
-   npm run build
 To create a production build of the application:
    ```bash
    npm run build
