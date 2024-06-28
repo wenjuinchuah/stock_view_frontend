@@ -22,20 +22,27 @@ export const useDashboardViewStore = defineStore('dashboardView', () => {
                 state.status.value.setBusy()
 
                 // Check if data is available and if it is after trading hour
-                const [response1, response2] = await Promise.all([
-                    HttpService.get('/price_list/is_data_available'),
-                    HttpService.get('/price_list/is_after_trading_hour'),
-                ])
+                const response1 = await HttpService.get(
+                    '/price_list/is_data_available'
+                )
 
                 if (response1.data.status === HttpStatus.ERROR) {
                     throw response1.data
                 }
-                if (response2.data.status === HttpStatus.ERROR) {
-                    throw response2.data
-                }
 
                 state.isDataAvailable.value = response1.data.data
-                state.isAfterTradingHour.value = response2.data.data
+
+                if (state.isDataAvailable.value) {
+                    const response2 = await HttpService.get(
+                        '/price_list/is_after_trading_hour'
+                    )
+
+                    if (response2.data.status === HttpStatus.ERROR) {
+                        throw response2.data
+                    }
+
+                    state.isAfterTradingHour.value = response2.data.data
+                }
 
                 // Update the stock data if data is not available or if it is after trading hour
                 if (

@@ -31,12 +31,8 @@ const toggleEndDate = (): void => {
 function allowedStartDate(date: any): boolean {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-
-    if (endDate.value) {
-        return date <= endDate.value && date <= today
-    } else {
-        return date <= today
-    }
+    
+    return date <= today
 }
 
 const allowedEndDate = (date: any): boolean => {

@@ -280,9 +280,24 @@ const formatPercentage = (percentageChange: number) => {
                 height="154"
             ></v-img>
             <v-row no-gutters class="mb-2">
-                <v-col align="center" class="font-weight-medium"
-                    >No stock found</v-col
-                >
+                <v-col align="center" class="font-weight-medium">{{
+                    'No stock found'
+                }}</v-col>
+            </v-row>
+        </template>
+
+        <!-- Show error message while error -->
+        <template v-else-if="stockScreenerStore.status.isError()">
+            <v-img
+                :src="'/assets/svgs/error.svg'"
+                alt="error"
+                class="mt-3"
+                height="154"
+            ></v-img>
+            <v-row no-gutters class="mb-2">
+                <v-col align="center" class="font-weight-medium">{{
+                    stockScreenerStore.status.getError()
+                }}</v-col>
             </v-row>
         </template>
 
