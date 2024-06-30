@@ -3,6 +3,7 @@ export enum Indicator {
     MACD = 'MACD',
     KDJ = 'KDJ',
     VOLUME = 'VOL',
+    MATCHED_TIMESTAMP_LINE = 'MATCHED TIMESTAMP LINE',
 }
 
 export enum IndicatorSelection {

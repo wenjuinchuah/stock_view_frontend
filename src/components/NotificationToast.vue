@@ -10,13 +10,12 @@ const store = useNotificationStore()
             color="white"
             position="relative"
             v-model="store.isToggled"
-            multi-line
             rounded="lg"
             location="top"
-            timeout="4000"
+            :timeout="store.timeout"
             :key="store.notification.message"
         >
-            <v-row no-gutters class="mb-2">
+            <v-row no-gutters>
                 <v-col cols="auto" align-self="center"
                     ><v-icon
                         :icon="
@@ -31,9 +30,11 @@ const store = useNotificationStore()
                 ></v-col>
                 <v-col class="text-subtitle-1 font-weight-bold"
                     >{{
-                        store.notification.isError
-                            ? 'Oops! Something went wrong'
-                            : 'Notification'
+                        store.notification.title
+                            ? store.notification.title
+                            : store.notification.isError
+                              ? 'Oops! Something went wrong'
+                              : 'Notification'
                     }}
                 </v-col>
                 <v-col cols="1" align="end"
@@ -45,14 +46,16 @@ const store = useNotificationStore()
                     ></v-btn
                 ></v-col>
             </v-row>
-            <v-row no-gutters>
-                <v-col cols="auto" class="mr-1"
-                    >[{{ store.notification.date }}]</v-col
-                >
-                <v-col cols="auto"
-                    >{{ store.notification.message.split('.')[0] }}.</v-col
-                >
-            </v-row>
+            <template v-if="store.notification.message">
+                <v-row no-gutters class="mt-2">
+                    <v-col cols="auto" class="mr-1"
+                        >[{{ store.notification.date }}]</v-col
+                    >
+                    <v-col cols="auto"
+                        >{{ store.notification.message.split('.')[0] }}.</v-col
+                    >
+                </v-row>
+            </template>
         </v-snackbar>
     </template>
 </template>

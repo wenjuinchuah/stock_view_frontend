@@ -73,7 +73,6 @@ onUnmounted(() => {
 
 watch(stockChart, () => {
     if (!stockChart.value) {
-        console.log('WHY ITS UNMOUNTED')
         initialize()
     }
 })

@@ -4,7 +4,11 @@ import { Stock } from '@/classes/Stock'
 import HttpService from '@/services/HttpService'
 import { StoreStatus } from '@/classes/StoreStatus'
 import { ref } from 'vue'
-import { type Chart } from 'klinecharts'
+import {
+    type Chart,
+    registerIndicator,
+    type IndicatorTemplate,
+} from 'klinecharts'
 import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useChartSettingsStore } from '@/stores/ChartSettingsStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
@@ -108,6 +112,11 @@ export const useStockChartStore = defineStore('stockChart', () => {
                         state.stockChart.value!.removeIndicator(paneId, rule)
                         state.indicatorPaneDetails.value.delete(rule)
                     }
+                    // Remove custom indicators
+                    state.stockChart.value!.removeIndicator(
+                        paneId,
+                        Indicator.MATCHED_TIMESTAMP_LINE
+                    )
                 })
 
                 selectedRules.sort((a, b) => {
@@ -118,6 +127,26 @@ export const useStockChartStore = defineStore('stockChart', () => {
                     }
                     return 0
                 })
+
+                // Register custom indicator
+                const matchedTimestamp = stockScreenerStore.screenerResult.find(
+                    (stock) =>
+                        stock.stockCode === state.selectedStock.value?.stockCode
+                )?.matchedTimestamp
+                methods.registerCustomIndicator(matchedTimestamp)
+
+                // Add matched timestamp indicator
+                state.stockChart.value?.removeIndicator('candle_pane')
+
+                if (matchedTimestamp) {
+                    state.stockChart.value?.createIndicator(
+                        Indicator.MATCHED_TIMESTAMP_LINE,
+                        true,
+                        {
+                            id: 'candle_pane',
+                        }
+                    )
+                }
 
                 // Add indicators that are selected
                 selectedRules.forEach((rule) => {
@@ -141,9 +170,49 @@ export const useStockChartStore = defineStore('stockChart', () => {
                             ),
                         }) ?? ''
 
+                    // Add custom indicator to the sub chart
+                    state.stockChart.value!.createIndicator(
+                        Indicator.MATCHED_TIMESTAMP_LINE,
+                        true,
+                        {
+                            id: paneId,
+                        }
+                    )
+
                     state.indicatorPaneDetails.value.set(rule, paneId)
                 })
             }
+        },
+    }
+
+    const methods = {
+        registerCustomIndicator(timestamp?: number) {
+            if (timestamp === undefined) return
+
+            registerIndicator({
+                name: Indicator.MATCHED_TIMESTAMP_LINE,
+                shortName: '',
+                calc: (dataList) => dataList,
+                draw: ({ ctx, visibleRange, indicator, xAxis }) => {
+                    const { from, to } = visibleRange
+                    const result = indicator.result
+
+                    for (let i = from; i < to; i++) {
+                        if (result[i].timestamp !== timestamp) continue
+                        const x = xAxis.convertToPixel(i)
+
+                        ctx.strokeStyle = 'blue'
+                        ctx.lineWidth = 1
+                        ctx.setLineDash([5, 5])
+                        ctx.beginPath()
+                        ctx.moveTo(x, 0)
+                        ctx.lineTo(x, innerHeight)
+                        ctx.stroke()
+                    }
+
+                    return false
+                },
+            } as IndicatorTemplate)
         },
     }
 

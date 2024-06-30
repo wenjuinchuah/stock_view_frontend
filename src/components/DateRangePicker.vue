@@ -14,7 +14,6 @@ const endDate = ref<Date>(initialEndDate ?? null)
 
 const toggleStartDate = (): void => {
     startDateToggled.value = !startDateToggled.value
-    console.log('toggleStartDate: ' + startDateToggled.value)
     if (endDateToggled.value === true) {
         endDateToggled.value = false
     }
@@ -22,7 +21,6 @@ const toggleStartDate = (): void => {
 
 const toggleEndDate = (): void => {
     endDateToggled.value = !endDateToggled.value
-    console.log('toggleEndDate: ' + endDateToggled.value)
     if (startDateToggled.value === true) {
         startDateToggled.value = false
     }

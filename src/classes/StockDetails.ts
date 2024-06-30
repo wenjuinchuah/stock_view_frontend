@@ -3,17 +3,20 @@ export class StockDetails {
     stockName: string
     closePrice: number
     percentageChange: number
+    matchedTimestamp: number
 
     constructor(
         stockCode: string,
         stockName: string,
         closePrice: number,
-        percentageChange: number
+        percentageChange: number,
+        matchedTimestamp: number
     ) {
         this.stockCode = stockCode
         this.stockName = stockName
         this.closePrice = closePrice
         this.percentageChange = percentageChange
+        this.matchedTimestamp = matchedTimestamp
     }
 
     static fromJson(json: any): StockDetails[] {
@@ -24,6 +27,7 @@ export class StockDetails {
                     stockName: item.stock_name,
                     closePrice: item.close_price,
                     percentageChange: item.percentage_change,
+                    matchedTimestamp: item.matched_timestamp * 1000,
                 }
             })
         }
