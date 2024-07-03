@@ -171,13 +171,15 @@ export const useStockChartStore = defineStore('stockChart', () => {
                         }) ?? ''
 
                     // Add custom indicator to the sub chart
-                    state.stockChart.value!.createIndicator(
-                        Indicator.MATCHED_TIMESTAMP_LINE,
-                        true,
-                        {
-                            id: paneId,
-                        }
-                    )
+                    if (matchedTimestamp) {
+                        state.stockChart.value!.createIndicator(
+                            Indicator.MATCHED_TIMESTAMP_LINE,
+                            true,
+                            {
+                                id: paneId,
+                            }
+                        )
+                    }
 
                     state.indicatorPaneDetails.value.set(rule, paneId)
                 })
