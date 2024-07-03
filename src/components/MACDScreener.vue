@@ -64,11 +64,12 @@ watch(
                     class="ml-1 mb-1"
                     color="grey-darken-2"
                 ></v-icon
-                ><v-tooltip location="top" activator="parent">
-                    The Moving Average Convergence Divergence (MACD) is a
-                    popular technical analysis tool used to identify changes in
-                    the strength, direction, momentum, and duration of a trend
-                    in a stock's price.
+                ><v-tooltip location="top" activator="parent" max-width="400">
+                    The Moving Average Convergence Divergence (MACD) identifies
+                    trend direction and strength by showing the relationship
+                    between two moving averages. A cross above the signal line
+                    suggests a bullish trend; a cross below suggests a bearish
+                    trend.
                 </v-tooltip>
             </span></v-col
         >

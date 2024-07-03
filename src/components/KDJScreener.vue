@@ -64,10 +64,11 @@ watch(
                     class="ml-1 mb-1"
                     color="grey-darken-2"
                 ></v-icon
-                ><v-tooltip location="top" activator="parent">
-                    The KDJ indicator is a technical analysis tool that combines
-                    elements of the stochastic oscillator and moving averages to
-                    identify potential buy and sell signals.
+                ><v-tooltip location="top" activator="parent" max-width="400">
+                    The KDJ indicator shows momentum using K, D, and J lines. A
+                    K line crossing above D indicates a buy signal, while
+                    crossing below indicates a sell signal. The J line offers
+                    additional signal strength insights.
                 </v-tooltip>
             </span></v-col
         >
