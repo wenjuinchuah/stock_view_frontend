@@ -14,6 +14,7 @@ import { useChartSettingsStore } from '@/stores/ChartSettingsStore'
 import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { Indicator } from '@/enums/Indicator'
 import { StockIndicator } from '@/classes/StockIndicator'
+import type { MatchedIndicator } from '@/classes/StockDetails'
 
 export const useStockChartStore = defineStore('stockChart', () => {
     const defaultStockCode: string = '0001'
@@ -128,26 +129,6 @@ export const useStockChartStore = defineStore('stockChart', () => {
                     return 0
                 })
 
-                // Register custom indicator
-                const matchedTimestamp = stockScreenerStore.screenerResult.find(
-                    (stock) =>
-                        stock.stockCode === state.selectedStock.value?.stockCode
-                )?.matchedTimestamp
-                methods.registerCustomIndicator(matchedTimestamp)
-
-                // Add matched timestamp indicator
-                state.stockChart.value?.removeIndicator('candle_pane')
-
-                if (matchedTimestamp) {
-                    state.stockChart.value?.createIndicator(
-                        Indicator.MATCHED_TIMESTAMP_LINE,
-                        true,
-                        {
-                            id: 'candle_pane',
-                        }
-                    )
-                }
-
                 // Add indicators that are selected
                 selectedRules.forEach((rule) => {
                     if (state.indicatorPaneDetails.value.has(rule)) {
@@ -170,15 +151,28 @@ export const useStockChartStore = defineStore('stockChart', () => {
                             ),
                         }) ?? ''
 
+                    // Register custom indicator
+                    const matchedIndicator: MatchedIndicator[] | undefined =
+                        stockScreenerStore.screenerResult.find(
+                            (stock) =>
+                                stock.stockCode ===
+                                state.selectedStock.value?.stockCode
+                        )?.matchedIndicator
+
                     // Add custom indicator to the sub chart
-                    if (matchedTimestamp) {
-                        state.stockChart.value!.createIndicator(
-                            Indicator.MATCHED_TIMESTAMP_LINE,
-                            true,
-                            {
-                                id: paneId,
+                    if (matchedIndicator) {
+                        matchedIndicator.forEach((item) => {
+                            if (item.indicator === rule) {
+                                methods.registerCustomIndicator(item.matchedAt)
+                                state.stockChart.value!.createIndicator(
+                                    Indicator.MATCHED_TIMESTAMP_LINE,
+                                    true,
+                                    {
+                                        id: paneId,
+                                    }
+                                )
                             }
-                        )
+                        })
                     }
 
                     state.indicatorPaneDetails.value.set(rule, paneId)
