@@ -17,23 +17,6 @@ This is the frontend application for the Stock View system.
 2. Install the dependencies:
    ```bash
    npm install
-This is the frontend application for the Stock View system.
-
-## Prerequisites
-
-- Node.js (LTS version recommended)
-- npm (comes with Node.js)
-
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/wenjuinchuah/stock_view_frontend.git
-   cd stock_view_frontend
-
-2. Install the dependencies:
-   ```bash
-   npm install
 
 ## Running the Application
 
