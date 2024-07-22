@@ -18,6 +18,7 @@ const fastPeriod = ref<number>(defaultValue.value.fastPeriod)
 const slowPeriod = ref<number>(defaultValue.value.slowPeriod)
 const signalPeriod = ref<number>(defaultValue.value.signalPeriod)
 
+// Watch the selection changes and update the selectionIndex
 watch(selection, (newSelection) => {
     switch (newSelection.value) {
         case IndicatorSelection.BULLISH:
@@ -29,6 +30,7 @@ watch(selection, (newSelection) => {
     }
 })
 
+// Watch the value changes and update stock screener
 watch(
     [selection, fastPeriod, slowPeriod, signalPeriod],
     () => {

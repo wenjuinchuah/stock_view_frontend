@@ -13,6 +13,7 @@ const storeSelectedStock = computed<Stock | undefined>(
 const selectedStock = ref<Stock>()
 const stockChartStore = useStockChartStore()
 
+// Watch the selected stock changes and update the stock chart
 watch(selectedStock, async () => {
     if (
         selectedStock.value !== storeSelectedStock.value &&

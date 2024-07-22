@@ -12,6 +12,7 @@ const selectedStock = computed<Stock | undefined>(
 )
 const stockChart = computed<Chart | undefined>(() => stockChartStore.stockChart)
 
+// Resize the chart when the window is resized
 const handleResize = () => {
     window.onresize = () => {
         setTimeout(() => {
@@ -22,6 +23,7 @@ const handleResize = () => {
     }
 }
 
+// Initialize the stock chart
 const initialize = async () => {
     if (!stockChart.value) {
         const chart = init('chart', {
@@ -62,15 +64,18 @@ const initialize = async () => {
     }
 }
 
+// Initialize the stock chart when the component is mounted
 onMounted(() => {
     initialize()
 })
 
+// Dispose the stock chart when the component is unmounted
 onUnmounted(() => {
     dispose(stockChartStore.stockChart as Chart)
     window.removeEventListener('resize', handleResize)
 })
 
+// Watch the stock chart changes and initialize the stock chart
 watch(stockChart, () => {
     if (!stockChart.value) {
         initialize()

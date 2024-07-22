@@ -18,6 +18,7 @@ const loopbackPeriod = ref<number>(defaultValue.value.loopbackPeriod)
 const signalPeriod = ref<number>(defaultValue.value.signalPeriod)
 const smoothPeriod = ref<number>(defaultValue.value.smoothPeriod)
 
+// Watch the selection changes and update the selectionIndex
 watch(selection, (newSelection) => {
     switch (newSelection.value) {
         case IndicatorSelection.GOLDEN_CROSS:
@@ -29,6 +30,7 @@ watch(selection, (newSelection) => {
     }
 })
 
+// Watch the value changes and update stock screener
 watch(
     [selection, loopbackPeriod, signalPeriod, smoothPeriod],
     () => {

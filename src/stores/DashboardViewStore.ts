@@ -10,9 +10,10 @@ export const useDashboardViewStore = defineStore('dashboardView', () => {
 
     const state = {
         status: ref<StoreStatus>(new StoreStatus()),
-        isDataAvailable: ref<boolean>(false),
+        isDataAvailable: ref<boolean>(true),
         isAfterTradingHour: ref<boolean>(false),
         responseMessage: ref<string>(''),
+        totalNoOfStocks: ref<number>(0),
     }
 
     const actions = {
@@ -55,14 +56,13 @@ export const useDashboardViewStore = defineStore('dashboardView', () => {
                         throw response3.data
                     }
 
-                    state.responseMessage.value = response3.data.data.message
+                    state.totalNoOfStocks.value = response3.data.data
                 }
 
                 // Update the price list data if data is not available
                 if (!state.isDataAvailable.value) {
-                    const response4 = await HttpService.get(
-                        '/price_list/update/initialize'
-                    )
+                    const response4 =
+                        await HttpService.post('/price_list/update')
                     if (response4.data.status === HttpStatus.ERROR) {
                         throw response4.data
                     }
@@ -70,18 +70,18 @@ export const useDashboardViewStore = defineStore('dashboardView', () => {
                 }
 
                 // Update the price list data if data is available and it is after trading hour
-                if (
-                    state.isDataAvailable.value &&
-                    state.isAfterTradingHour.value
-                ) {
-                    const response5 =
-                        await HttpService.post('/price_list/update')
-                    if (response5.data.status === HttpStatus.ERROR) {
-                        throw response5.data
-                    }
-                    stockChartStore.fetch()
-                    state.responseMessage.value = response5.data.data.message
-                }
+                // if (
+                //     state.isDataAvailable.value &&
+                //     state.isAfterTradingHour.value
+                // ) {
+                //     const response5 =
+                //         await HttpService.post('/price_list/update')
+                //     if (response5.data.status === HttpStatus.ERROR) {
+                //         throw response5.data
+                //     }
+                //     stockChartStore.fetch()
+                //     state.responseMessage.value = response5.data.data.message
+                // }
 
                 state.status.value.setIdle()
             } catch (error) {

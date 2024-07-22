@@ -1,5 +1,3 @@
-import type { Indicator } from '@/enums/Indicator'
-
 export class StockDetails {
     stockCode: string
     stockName: string

@@ -20,6 +20,7 @@ const value = ref<number>(
 )
 const periodValue = ref<number>(defaultValue.value.timePeriod)
 
+// Watch the selection changes and update the selectionIndex
 watch(selection, (newSelection) => {
     switch (newSelection.value) {
         case IndicatorSelection.OVERBOUGHT:
@@ -33,6 +34,7 @@ watch(selection, (newSelection) => {
     }
 })
 
+// Watch the value changes and update stock screener
 watch(
     [selection, value, periodValue],
     () => {

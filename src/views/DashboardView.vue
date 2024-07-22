@@ -11,8 +11,8 @@ import { Notification } from '@/classes/Notification'
 import { InternetStatus } from '@/enums/HttpStatus'
 
 const notificationStore = useNotificationStore()
-
 const dashboardViewStore = useDashboardViewStore()
+
 const isAfterTradingHour = computed<boolean>(
     () => dashboardViewStore.isAfterTradingHour
 )
@@ -20,6 +20,7 @@ const isDataAvailable = computed<boolean>(
     () => dashboardViewStore.isDataAvailable
 )
 
+// Set notification message
 const setNotification = (message: string) => {
     const notification = new Notification(message)
     notificationStore.notification = notification
@@ -27,6 +28,7 @@ const setNotification = (message: string) => {
     notificationStore.toggle()
 }
 
+// Set network error notification
 const setNetworkErrorNotification = () => {
     const notification = new Notification(
         undefined,
@@ -38,6 +40,7 @@ const setNetworkErrorNotification = () => {
     notificationStore.toggle()
 }
 
+// Update internet status
 const updateInternetStatus = () => {
     if (navigator.onLine == false) {
         setNetworkErrorNotification()
@@ -48,6 +51,7 @@ const updateInternetStatus = () => {
     }
 }
 
+// Initialize the store on mounted and add event listener for internet status
 onMounted(async () => {
     await dashboardViewStore.init()
     window.addEventListener(InternetStatus.ONLINE, updateInternetStatus)
@@ -55,11 +59,13 @@ onMounted(async () => {
     updateInternetStatus()
 })
 
+// Unmount the event listener for internet status
 onBeforeUnmount(() => {
     window.removeEventListener(InternetStatus.ONLINE, updateInternetStatus)
     window.removeEventListener(InternetStatus.OFFLINE, updateInternetStatus)
 })
 
+// Watch the trading hour and data availability changes and set notification
 watch([isAfterTradingHour, isDataAvailable], () => {
     if (isAfterTradingHour.value && isDataAvailable.value) {
         setNotification('Fetching data from the server, it may take a while.')

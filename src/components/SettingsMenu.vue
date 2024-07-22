@@ -16,6 +16,7 @@ const screenerResult = computed<StockDetails[]>(
     () => stockScreenerStore.screenerResult
 )
 
+// Load more if last stock code is not 9997
 const loadMore = (entry: IntersectionObserverEntry) => {
     if (entry && stockScreenerStore.stockScreener.lastStockCode !== '9997') {
         stockScreenerStore.fetch()

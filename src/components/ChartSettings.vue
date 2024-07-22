@@ -18,12 +18,14 @@ const stockIndicator = computed<string[]>(() =>
     )
 )
 
+// Update the rules and fetch the stock chart
 const submit = () => {
     addRuleStore.updateRules(chartSettingsStore.indicators)
     stockChartStore.fetch()
     chartSettingsStore.toggle()
 }
 
+// Watch the selected rules changes
 watch(stockIndicator, () => {
     addRuleStore.selectedRules = stockIndicator.value
 })

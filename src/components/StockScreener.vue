@@ -22,11 +22,13 @@ const selectedRules = computed(() =>
     addRuleStore.selectedRules.filter((value) => value !== Indicator.VOLUME)
 )
 
+// Initialize the store on mounted
 onMounted(async () => {
     await addRuleStore.init()
     await stockScreenerStore.getIndicatorSelector()
 })
 
+// Watch the selected rules changes
 watch(selectedRules, () => {
     const screenerStores: any[] = []
     selectedRules.value.forEach((value) => {

@@ -8,15 +8,18 @@ const availableRules = computed(() => store.availableRules)
 const storeSelectedRules = computed(() => store.selectedRules)
 const selectedRules = ref<string[]>([])
 
+// Toggle the dialog and update the rules
 const confirm = () => {
     store.toggle()
     store.updateRules(selectedRules.value)
 }
 
+// Watch the selected rules changes
 watch(storeSelectedRules, (newRules) => {
     selectedRules.value = newRules
 })
 
+// Initialize the store on mounted
 onMounted(async () => {
     await store.init()
     selectedRules.value = storeSelectedRules.value.filter(
