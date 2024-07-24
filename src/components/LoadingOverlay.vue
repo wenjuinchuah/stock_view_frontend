@@ -2,7 +2,7 @@
 import HttpService from '@/services/HttpService'
 import { useDashboardViewStore } from '@/stores/DashboardViewStore'
 import { useStockChartStore } from '@/stores/StockChartStore'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 const dashboardViewStore = useDashboardViewStore()
 const stockChartStore = useStockChartStore()
@@ -11,23 +11,32 @@ const isDataAvailable = computed(() => dashboardViewStore.isDataAvailable)
 const totalNoOfStocks = computed(() => dashboardViewStore.totalNoOfStocks)
 const showOverlay = computed(() => !isDataAvailable.value || false)
 const fetchingPercentage = computed(
-    () => (currentFetchCount.value / totalNoOfStocks.value) * 100 ?? 0
+    () => (currentFetchCount.value / totalNoOfStocks.value) * 100
 )
 
 const currentFetchCount = ref<number>(0)
 
-// Get last pricelist index every 10 seconds to show the loading progress
-setInterval(async () => {
-    if (!isDataAvailable.value) {
+const fetchLastStockDataIndex = async () => {
+    try {
         const response = await HttpService.get(
             '/price_list/get_last_updated_price_list_index'
         )
         currentFetchCount.value = response.data.data
-        if (currentFetchCount.value === totalNoOfStocks.value) {
-            stockChartStore.fetch()
-        }
+    } catch (error) {
+        console.log(error)
     }
-}, 10000)
+    if (currentFetchCount.value < totalNoOfStocks.value) {
+        fetchLastStockDataIndex()
+    } else {
+        stockChartStore.fetch()
+    }
+}
+
+onMounted(() => {
+    if (!isDataAvailable.value) {
+        fetchLastStockDataIndex()
+    }
+})
 </script>
 
 <template>
@@ -43,7 +52,7 @@ setInterval(async () => {
             </v-card-subtitle>
             <v-card-text align="center" class="mb-4">
                 {{ currentFetchCount }}/{{ totalNoOfStocks }} ({{
-                    fetchingPercentage.toFixed(0)
+                    (fetchingPercentage ?? 0).toFixed(0)
                 }}%)
             </v-card-text>
             <v-progress-linear
