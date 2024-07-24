@@ -20,11 +20,11 @@ This is the frontend application for the Stock View system.
 
 ## Running the Application
 
-1. Start the development server:
+1. Start the development server on port 8080:
    ```bash
-   npm run dev
+   npm run dev -- --port 8080
 
-2. Open your browser and navigate to `http://localhost:5173`.
+2. Open your browser and navigate to `http://localhost:8080`.
 
 ## Building for Production
 
