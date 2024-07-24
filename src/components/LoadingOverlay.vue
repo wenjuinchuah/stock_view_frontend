@@ -17,26 +17,24 @@ const fetchingPercentage = computed(
 const currentFetchCount = ref<number>(0)
 
 const fetchLastStockDataIndex = async () => {
-    try {
-        const response = await HttpService.get(
-            '/price_list/get_last_updated_price_list_index'
-        )
-        currentFetchCount.value = response.data.data
-    } catch (error) {
-        console.log(error)
-    }
-    if (currentFetchCount.value < totalNoOfStocks.value) {
-        fetchLastStockDataIndex()
-    } else {
-        stockChartStore.fetch()
+    if (!isDataAvailable.value) {
+        try {
+            const response = await HttpService.get(
+                '/price_list/get_last_updated_price_list_index'
+            )
+            currentFetchCount.value = response.data.data
+        } catch (error) {
+            console.log(error)
+        }
+        if (currentFetchCount.value < totalNoOfStocks.value) {
+            fetchLastStockDataIndex()
+        } else {
+            stockChartStore.fetch()
+        }
     }
 }
 
-onMounted(() => {
-    if (!isDataAvailable.value) {
-        fetchLastStockDataIndex()
-    }
-})
+onMounted(() => fetchLastStockDataIndex())
 </script>
 
 <template>
