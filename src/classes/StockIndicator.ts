@@ -12,6 +12,7 @@ export abstract class StockIndicator {
         if (json.kdj) {
             indicators.set(Indicator.KDJ, KDJ.fromJson(json.kdj))
         }
+        // TODO: Add new indicator here
         return indicators
     }
 
@@ -26,6 +27,7 @@ export abstract class StockIndicator {
         if (stockIndicators.get(Indicator.KDJ)) {
             json.kdj = KDJ.toJson(stockIndicators.get(Indicator.KDJ) as KDJ)
         }
+        // TODO: Add new indicator here
         return json
     }
 
@@ -37,6 +39,7 @@ export abstract class StockIndicator {
                 return MACD.getParams(indicator as MACD)
             case Indicator.KDJ:
                 return KDJ.getParams(indicator as KDJ)
+            // TODO: Add new indicator here
             default:
                 return []
         }
@@ -165,3 +168,5 @@ export class KDJ extends StockIndicator {
         return [kdj.loopbackPeriod, kdj.signalPeriod, kdj.smoothPeriod]
     }
 }
+
+// TODO: Add new indicator here

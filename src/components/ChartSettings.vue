@@ -5,6 +5,7 @@ import { useStockChartStore } from '@/stores/StockChartStore'
 import CCIScreener from '@/components/CCIScreener.vue'
 import MACDScreener from '@/components/MACDScreener.vue'
 import KDJScreener from '@/components/KDJScreener.vue'
+// TODO: Add new indicator here
 import AddRule from '@/components/AddRule.vue'
 import { computed, watch } from 'vue'
 import { Indicator } from '@/enums/Indicator'
@@ -136,6 +137,7 @@ watch(stockIndicator, () => {
                         <template v-else-if="key === Indicator.KDJ">
                             <KDJScreener :isSettings="true" />
                         </template>
+                        <!-- TODO: Add new indicator here -->
                     </div>
                 </template>
             </template>

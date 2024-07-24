@@ -4,11 +4,13 @@ import { useAddRuleStore } from '@/stores/AddRuleStore'
 import { useCCIScreenerStore } from '@/stores/CCIScreenerStore'
 import { useMACDScreenerStore } from '@/stores/MACDScreenerStore'
 import { useKDJScreenerStore } from '@/stores/KDJScreenerStore'
+// TODO: Add new indicator here
 import DateRangePicker from '@/components/DateRangePicker.vue'
 import AddRule from '@/components/AddRule.vue'
 import CCIScreener from '@/components/CCIScreener.vue'
 import MACDScreener from '@/components/MACDScreener.vue'
 import KDJScreener from '@/components/KDJScreener.vue'
+// TODO: Add new indicator here
 import { onMounted, computed, watch } from 'vue'
 import { Indicator } from '@/enums/Indicator'
 
@@ -41,6 +43,7 @@ watch(selectedRules, () => {
         if (value === Indicator.KDJ) {
             screenerStores.push(useKDJScreenerStore())
         }
+        // TODO: Add new indicator here
     })
     if (selectedRules.value.length === 0) {
         stockScreenerStore.isValidate = true
@@ -137,6 +140,7 @@ watch(selectedRules, () => {
                         <template v-else-if="value === Indicator.KDJ">
                             <KDJScreener />
                         </template>
+                        <!-- TODO: Add new indicator here -->
                     </div>
                 </template>
                 <!-- Add new rules button -->

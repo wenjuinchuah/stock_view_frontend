@@ -14,7 +14,7 @@ const selection = ref<ScreenerSelection>(
     store.screenerSelection()[store.selectionIndex]
 )
 const value = ref<number>(
-    selection.value.value === 'overbought'
+    selection.value.value === IndicatorSelection.OVERBOUGHT
         ? defaultValue.value.overbought
         : defaultValue.value.oversold
 )
