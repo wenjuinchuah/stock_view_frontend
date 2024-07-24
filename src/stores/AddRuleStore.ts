@@ -46,7 +46,7 @@ export const useAddRuleStore = defineStore('addRule', () => {
             state.selectedRules.value = rules
             chartSettingsStore.updateIndicators(rules)
         },
-        // Remove rules to the stock screener
+        // Remove rules from the stock screener
         removeRules(rules: string[]): void {
             const newSelectedRules = state.selectedRules.value.filter(
                 (rule) => !rules.includes(rule)

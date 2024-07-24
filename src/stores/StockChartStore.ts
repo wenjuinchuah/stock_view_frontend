@@ -93,6 +93,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
             if (state.stockChart.value) {
                 const selectedRules: string[] = addRuleStore.selectedRules
 
+                // Volume indicator
                 if (chartSettingsStore.showVolume) {
                     if (!selectedRules.includes(Indicator.VOLUME)) {
                         selectedRules.push(Indicator.VOLUME)
@@ -120,6 +121,7 @@ export const useStockChartStore = defineStore('stockChart', () => {
                     )
                 })
 
+                // Sort the selected rules to ensure volume is the first indicator
                 selectedRules.sort((a, b) => {
                     if (a === Indicator.VOLUME) {
                         return -1

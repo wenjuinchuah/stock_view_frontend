@@ -5,7 +5,7 @@ import { useStockScreenerStore } from '@/stores/StockScreenerStore'
 import { CCI } from '@/classes/StockIndicator'
 import type { ScreenerSelection } from '@/classes/ScreenerSelection'
 import type { StockScreener } from '@/classes/StockScreener'
-import { Indicator } from '@/enums/Indicator'
+import { Indicator, IndicatorSelection } from '@/enums/Indicator'
 
 export const useCCIScreenerStore = defineStore('cciScreener', () => {
     const addRuleStore = useAddRuleStore()
@@ -59,9 +59,9 @@ export const useCCIScreenerStore = defineStore('cciScreener', () => {
             value: number
         ): void {
             const overbought: number | null =
-                selectionType === 'overbought' ? value : null
+                selectionType === IndicatorSelection.OVERBOUGHT ? value : null
             const oversold: number | null =
-                selectionType === 'oversold' ? value : null
+                selectionType === IndicatorSelection.OVERSOLD ? value : null
 
             state.defaultValue.value = {
                 timePeriod,

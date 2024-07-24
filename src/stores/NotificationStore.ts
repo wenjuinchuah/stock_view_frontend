@@ -51,6 +51,7 @@ export const useNotificationStore = defineStore('notification', () => {
         toggle(): void {
             state.isToggled.value = !state.isToggled.value
         },
+        // Set the notification message timeout value
         setTimeout(value: number): void {
             state.timeout.value = value ?? NotificationUtils.DEFAULT_TIMEOUT
         },

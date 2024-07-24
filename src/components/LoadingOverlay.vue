@@ -11,7 +11,7 @@ const isDataAvailable = computed(() => dashboardViewStore.isDataAvailable)
 const totalNoOfStocks = computed(() => dashboardViewStore.totalNoOfStocks)
 const showOverlay = computed(() => !isDataAvailable.value || false)
 const fetchingPercentage = computed(
-    () => (currentFetchCount.value / totalNoOfStocks.value) * 100
+    () => (currentFetchCount.value / totalNoOfStocks.value) * 100 ?? 0
 )
 
 const currentFetchCount = ref<number>(0)

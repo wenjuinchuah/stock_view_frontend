@@ -70,18 +70,18 @@ export const useDashboardViewStore = defineStore('dashboardView', () => {
                 }
 
                 // Update the price list data if data is available and it is after trading hour
-                // if (
-                //     state.isDataAvailable.value &&
-                //     state.isAfterTradingHour.value
-                // ) {
-                //     const response5 =
-                //         await HttpService.post('/price_list/update')
-                //     if (response5.data.status === HttpStatus.ERROR) {
-                //         throw response5.data
-                //     }
-                //     stockChartStore.fetch()
-                //     state.responseMessage.value = response5.data.data.message
-                // }
+                if (
+                    state.isDataAvailable.value &&
+                    state.isAfterTradingHour.value
+                ) {
+                    const response5 =
+                        await HttpService.post('/price_list/update')
+                    if (response5.data.status === HttpStatus.ERROR) {
+                        throw response5.data
+                    }
+                    stockChartStore.fetch()
+                    state.responseMessage.value = response5.data.data.message
+                }
 
                 state.status.value.setIdle()
             } catch (error) {
