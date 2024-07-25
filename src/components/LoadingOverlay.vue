@@ -2,7 +2,7 @@
 import HttpService from '@/services/HttpService'
 import { useDashboardViewStore } from '@/stores/DashboardViewStore'
 import { useStockChartStore } from '@/stores/StockChartStore'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const dashboardViewStore = useDashboardViewStore()
 const stockChartStore = useStockChartStore()
@@ -26,6 +26,10 @@ const fetchLastStockDataIndex = async () => {
                 '/price_list/get_last_updated_price_list_index'
             )
             currentFetchCount.value = response.data.data
+            if (currentFetchCount.value === 0) {
+                // If no data is available, set it to 0.1 to trigger watcher to fetch again
+                currentFetchCount.value = 0.1
+            }
         } catch (error) {
             console.log(error)
         }
@@ -38,7 +42,8 @@ watch([currentFetchCount, showOverlay], ([newIndex, newShowOverlayFlag]) => {
         setTimeout(() => {
             fetchLastStockDataIndex()
         }, 5000)
-    } else {
+    }
+    if (!newShowOverlayFlag) {
         stockChartStore.fetch()
     }
 })
@@ -56,7 +61,7 @@ watch([currentFetchCount, showOverlay], ([newIndex, newShowOverlayFlag]) => {
                 It might takes a while, please wait...
             </v-card-subtitle>
             <v-card-text align="center" class="mb-4">
-                {{ currentFetchCount }}/{{ totalNoOfStocks }} ({{
+                {{ currentFetchCount.toFixed(0) }}/{{ totalNoOfStocks }} ({{
                     fetchingPercentage().toFixed(0)
                 }}%)
             </v-card-text>
